@@ -1,0 +1,180 @@
+@use './mixins.scss';
+
+.header {
+  height: 78px;
+  background: transparent;
+  @include mixins.response(991px) {
+    margin-bottom: 22px;
+    height: 60px;
+  }
+  &__inner {
+    max-width: 1400px;
+    width: 100%;
+    margin: 0 auto;
+    height: 100%;
+    display: flex;
+    align-items: center;
+  }
+}
+
+.login-btn {
+  margin-left: auto;
+  border: 1px solid var(--blue);
+  border-radius: 100px;
+  padding: 0 24px;
+  width: 124px;
+  height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 140%;
+  color: var(--black);
+  gap: 6px;
+  transition: .3s ease-in-out;
+  svg {
+    fill: var(--black);
+    transition: .3s ease-in-out;
+  }
+  &:hover {
+    color: var(--blue);
+    svg {
+      fill: var(--blue);
+    }
+  }
+  @include mixins.response(991px) {
+    width: 108px;
+    height: 40px;
+    padding: 0;
+  }
+}
+
+.logo {
+  @include mixins.response(991px) {
+    max-width: 115px;
+  }
+}
+
+.user-button {
+  margin-left: auto;
+  border-radius: 100px;
+  padding: 9px 18px 9px 14px;
+  width: 144px;
+  height: 42px;
+  background: var(--white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 140%;
+  color: var(--black);
+  cursor: pointer;
+  transition: .3s ease-in-out;
+  span {
+    border-radius: 100px;
+    width: 28px;
+    height: 28px;
+    background-color: #f3f1f1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  @include mixins.hover() {
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+  }
+}
+
+.user-dropdown {
+  &__box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    height: 124px;
+    padding-bottom: 24px;
+    cursor: default;
+    border-bottom: 1px solid var(--background);
+    margin-bottom: 24px;
+  }
+  &__avatar {
+    width: 66px;
+    height: 66px;
+    border-radius: 100px;
+    background-color: #f3f1f1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    svg {
+      width: 30px;
+      height: 30px;
+    }
+    &::after {
+      content: '';
+      bottom: 0;
+      right: 5px;
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      border: 2px solid #fff;
+      background: #65AF4B;
+    }
+  }
+  &__name {
+    font-weight: 500;
+    font-size: 18px;
+    line-height: 140%;
+    color: var(--black);
+  }
+  &__item,
+  &__logout {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 500;
+    font-size: 16px;
+    line-height: 160%;
+    color: var(--black);
+    cursor: pointer;
+    transition: .3s ease-in-out;
+    margin-bottom: 18px;
+    svg {
+      fill: var(--black);
+      transition: .3s ease-in-out;
+    }
+    &:hover {
+      color: var(--blue) !important;
+      svg {
+        fill: var(--blue);
+      }
+    }
+  }
+  &__logout {
+    margin: 100px 0 0;
+    &:hover {
+      color: #930000 !important;
+      svg {
+        fill: #930000;
+      }
+    }
+  }
+}
+
+.ant-dropdown {
+  min-width: 320px !important;
+  border: 1px solid #eee;
+  .ant-dropdown-menu {
+    padding: 24px 20px !important;
+    border-radius: 20px !important;
+  }
+  .ant-dropdown-menu-item {
+    padding: 0 !important;
+    &:hover {
+      background: #fff !important;
+    }
+  }
+}
