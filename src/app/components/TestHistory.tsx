@@ -2,11 +2,12 @@ import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import ArrowIcon from '@/assets/icons/arrow-right.svg?react';
 
-import { useAuthStore } from '@/store/authStore.ts';
-import { useTestStore } from '@/store/testStore.ts';
+// Import directly from the individual stores
+import { useAuthStore } from '@/store/authStore';
+import { useTestStore } from '@/store/testStore';
 
-import { ROUTES } from '@app/routes/paths.ts';
-import { TestResult } from '@app/types';
+import { ROUTES } from '@/app/routes/paths';
+import { TestResult } from '@/app/types';
 import '@app/styles/history.scss';
 
 export const TestHistory: React.FC = () => {
@@ -30,6 +31,7 @@ export const TestHistory: React.FC = () => {
 
         const loadTestResults = async () => {
             try {
+                setShowError(false);
                 // Convert user.id to number regardless of its original type
                 const userId = parseInt(user.id.toString(), 10);
 
@@ -37,11 +39,7 @@ export const TestHistory: React.FC = () => {
                     throw new Error(`Invalid user ID: ${user.id}`);
                 }
 
-                console.log('Fetching test results for user ID:', userId);
                 await fetchUserTestResults(userId);
-
-                // Debug: Log results after fetching
-                console.log('Fetched results:', userTestResults);
             } catch (error) {
                 console.error('Failed to fetch test history:', error);
                 setShowError(true);
@@ -49,16 +47,13 @@ export const TestHistory: React.FC = () => {
         };
 
         loadTestResults();
-    }, [user, navigate]); // Remove fetchUserTestResults and userTestResults from dependencies to prevent infinite loops
+    }, [user, navigate, fetchUserTestResults]); // Don't include userTestResults here
 
     // Format date to DD.MM.YYYY
     const formatDate = (dateString: Date | string): string => {
         const date = new Date(dateString);
         return `${date.getDate().toString().padStart(2, '0')}.${(date.getMonth() + 1).toString().padStart(2, '0')}.${date.getFullYear()}`;
     };
-
-    // Debug: Log current results
-    console.log('Current userTestResults:', userTestResults);
 
     if (isLoading) {
         return (
@@ -81,6 +76,13 @@ export const TestHistory: React.FC = () => {
                         <div className="test-history__title">Історія тестів</div>
                     </div>
                     <div>Помилка завантаження історії тестів: {error || 'Невідома помилка'}</div>
+                    <button
+                        onClick={() => window.location.reload()}
+                        className="test-history__reload-btn"
+                        style={{ marginTop: '20px', padding: '8px 16px' }}
+                    >
+                        Спробувати знову
+                    </button>
                 </div>
             </div>
         );

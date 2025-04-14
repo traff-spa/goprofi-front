@@ -1,5 +1,4 @@
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
-
 import { ErrorResponse } from '../types';
 
 // Create API client
@@ -27,6 +26,7 @@ apiClient.interceptors.response.use(
     (response) => response,
     (error) => {
         if (error.response?.status === 401) {
+            // Unauthorized - clear token and redirect to auth
             localStorage.removeItem('auth_token');
             window.location.href = '/auth';
         }
@@ -44,7 +44,17 @@ export const request = async <T>(config: AxiosRequestConfig): Promise<T> => {
             message: error.message || 'Unknown error occurred',
             status: 'error'
         };
-        console.error('API request failed:', errorResponse);
+
+        // Only log in development mode
+        if (process.env.NODE_ENV !== 'production') {
+            console.error('API request failed:', {
+                url: config.url,
+                method: config.method,
+                status: error.response?.status,
+                message: errorResponse.message
+            });
+        }
+
         throw errorResponse;
     }
 };

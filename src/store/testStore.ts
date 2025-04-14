@@ -1,16 +1,21 @@
 import {create} from 'zustand';
 import {persist} from "zustand/middleware";
-import {immer} from "zustand/middleware/immer";
 import {testService} from '@/app/api/services';
 
 import type {
     TestResult,
     Answer,
     TestStore,
-    Question
+    Question,
+    Test
 } from '@/app/types';
 
-const QUIZ_STORE = 'quiz_store'
+// Utility for conditional logging - only logs in development
+const logDebug = (message: string, data?: any) => {
+    if (process.env.NODE_ENV !== 'production') {
+        console.log(message, data !== undefined ? data : '');
+    }
+};
 
 // Initial state definition
 const initialState = {
@@ -22,225 +27,294 @@ const initialState = {
     userTestResults: [],
     isLoading: false,
     error: null,
+    // New tie-breaking properties
+    tieBreakingQuestions: [],
+    tiedTypes: [],
+    isTieBreaking: false,
 };
 
 export const useTestStore = create<TestStore>()(
     persist(
-        immer((set) => ({
+        (set) => ({
             ...initialState,
 
             resetCurrentTest: () => {
-                set(state => {
-                    state.currentTest = null;
-                    state.currentTestResult = null;
-                    state.currentTestQuestions = [];
-                    state.currentTestName = '';
+                set({
+                    currentTest: null,
+                    currentTestResult: null,
+                    currentTestQuestions: [],
+                    currentTestName: '',
                 });
             },
 
             startTest: async (userId: number, testId: number): Promise<TestResult | null> => {
-                set(state => { state.isLoading = true; state.error = null; });
+                set({ isLoading: true, error: null });
 
                 try {
-                    console.log(`Starting test for user ${userId}, test ID: ${testId}`);
+                    logDebug(`Starting test for user ${userId}, test ID: ${testId}`);
 
                     // Start the test first
-                    const testResultResponse = await testService.startTest(userId, testId);
-                    console.log('Test Result Response:', testResultResponse);
-
-                    // Ensure we have a valid test result response
-                    if (!testResultResponse || !testResultResponse.data) {
-                        throw new Error('Invalid test result response');
-                    }
+                    const testResult = await testService.startTest(userId, testId);
+                    logDebug('Test Result Response:', testResult);
 
                     // Fetch the questions
                     const questionsResponse = await testService.getTestQuestions(testId);
-                    console.log('Questions Response:', questionsResponse);
+                    logDebug('Questions Response:', questionsResponse);
 
                     // Ensure we have a valid questions response
-                    if (!questionsResponse) {
+                    if (!questionsResponse?.questions || !questionsResponse?.test_name) {
                         throw new Error('Invalid questions response');
                     }
 
-                    // Additional null checks
-                    if (!questionsResponse.questions || !questionsResponse.test_name) {
-                        throw new Error('Missing questions or test name');
-                    }
-
-                    set(state => {
-                        state.currentTestResult = testResultResponse.data;
-                        state.currentTestQuestions = questionsResponse.questions;
-                        state.currentTestName = questionsResponse.test_name;
-                        state.isLoading = false;
+                    set({
+                        currentTestResult: testResult,
+                        currentTestQuestions: questionsResponse.questions,
+                        currentTestName: questionsResponse.test_name,
+                        isLoading: false
                     });
 
-                    return testResultResponse.data;
+                    return testResult;
                 } catch (error: any) {
                     console.error('Error in startTest:', error);
-                    set(state => {
-                        state.error = error.message || 'Failed to start test';
-                        state.isLoading = false;
+                    set({
+                        error: error.message || 'Failed to start test',
+                        isLoading: false
                     });
                     return null;
                 }
             },
 
-            fetchAllTests: async () => {
-                set(state => { state.isLoading = true; state.error = null; });
+            fetchAllTests: async (): Promise<Test[]> => {
+                set({ isLoading: true, error: null });
 
                 try {
                     const response = await testService.getAllTests();
-                    console.log('All tests response:', response);
+                    logDebug('All tests response:', response);
 
-                    set(state => {
-                        state.tests = response.data.tests;
-                        state.isLoading = false;
+                    set({
+                        tests: response.tests,
+                        isLoading: false
                     });
+
+                    return response.tests;
                 } catch (error: any) {
                     console.error('Error fetching all tests:', error);
-                    set(state => {
-                        state.error = error.message || 'Failed to fetch tests';
-                        state.isLoading = false;
+                    set({
+                        error: error.message || 'Failed to fetch tests',
+                        isLoading: false
                     });
+                    return []; // Return empty array instead of null
                 }
             },
 
             fetchTestById: async (id: number) => {
-                set(state => { state.isLoading = true; state.error = null; });
+                set({ isLoading: true, error: null });
 
                 try {
-                    const response = await testService.getTestById(id);
+                    const test = await testService.getTestById(id);
+                    logDebug('Fetched test by ID:', test);
 
-                    set(state => {
-                        state.currentTest = response.data;
-                        state.isLoading = false;
+                    set({
+                        currentTest: test,
+                        isLoading: false
                     });
+
+                    return test;
                 } catch (error: any) {
                     console.error('Error fetching test by ID:', error);
-                    set(state => {
-                        state.error = error.message || 'Failed to fetch test';
-                        state.isLoading = false;
+                    set({
+                        error: error.message || 'Failed to fetch test',
+                        isLoading: false
                     });
+                    return null;
                 }
             },
 
             fetchTestQuestions: async (testId: number): Promise<Question[]> => {
-                set(state => { state.isLoading = true; state.error = null; });
+                set({ isLoading: true, error: null });
 
                 try {
                     const questionsResponse = await testService.getTestQuestions(testId);
-                    console.log('Fetched questions response:', questionsResponse);
+                    logDebug('Fetched questions response:', questionsResponse);
 
-                    set(state => {
-                        state.currentTestQuestions = questionsResponse.questions;
-                        state.currentTestName = questionsResponse.test_name;
-                        state.isLoading = false;
+                    set({
+                        currentTestQuestions: questionsResponse.questions,
+                        currentTestName: questionsResponse.test_name,
+                        isLoading: false
                     });
 
                     return questionsResponse.questions;
                 } catch (error: any) {
                     console.error('Error fetching test questions:', error);
-                    set(state => {
-                        state.error = error.message || 'Failed to fetch test questions';
-                        state.isLoading = false;
+                    set({
+                        error: error.message || 'Failed to fetch test questions',
+                        isLoading: false
+                    });
+                    return []; // Return empty array instead of null
+                }
+            },
+
+            fetchTestResult: async (id: number): Promise<TestResult | null> => {
+                set({ isLoading: true, error: null });
+
+                try {
+                    logDebug(`Fetching test result for ID: ${id}`);
+                    const testResult = await testService.getTestResult(id);
+                    logDebug('Fetched test result:', testResult);
+
+                    set({
+                        currentTestResult: testResult,
+                        isLoading: false
+                    });
+
+                    return testResult;
+                } catch (error: any) {
+                    console.error('Error fetching test result:', error);
+                    set({
+                        error: error.message || 'Failed to fetch test result',
+                        isLoading: false
+                    });
+                    return null;
+                }
+            },
+
+            fetchUserTestResults: async (userId: number): Promise<TestResult[]> => {
+                set({ isLoading: true, error: null });
+
+                try {
+                    const results = await testService.getUserTestResults(userId);
+
+                    set({
+                        userTestResults: results,
+                        isLoading: false
+                    });
+
+                    return results;
+                } catch (error: any) {
+                    console.error('Error fetching user test results:', error);
+                    set({
+                        error: error.message || 'Failed to fetch test history',
+                        isLoading: false,
+                        userTestResults: []
                     });
                     return [];
                 }
             },
 
-            fetchTestResult: async (id: number) => {
-                set(state => { state.isLoading = true; state.error = null; });
-
-                try {
-                    const response = await testService.getTestResult(id);
-                    console.log('Fetched test result:', response);
-
-                    set(state => {
-                        state.currentTestResult = response.data;
-                        state.isLoading = false;
-                    });
-                } catch (error: any) {
-                    console.error('Error fetching test result:', error);
-                    set(state => {
-                        state.error = error.message || 'Failed to fetch test result';
-                        state.isLoading = false;
-                    });
-                }
-            },
-
-            fetchUserTestResults: async (userId: number) => {
-                set(state => { state.isLoading = true; state.error = null; });
-
-                try {
-                    console.log(`Fetching test results for user ID: ${userId}`);
-                    const response = await testService.getUserTestResults(userId);
-                    console.log('User test results response:', response);
-
-                    // Check if we have valid data
-                    if (!response) {
-                        throw new Error('Invalid response format');
-                    }
-
-                    // Ensure we're setting an array
-                    const resultsArray = Array.isArray(response) ? response : [];
-
-                    console.log('Setting user test results:', resultsArray);
-
-                    set(state => {
-                        state.userTestResults = resultsArray;
-                        state.isLoading = false;
-                    });
-                } catch (error: any) {
-                    console.error('Error fetching user test results:', error);
-                    set(state => {
-                        state.error = error.message || 'Failed to fetch test history';
-                        state.isLoading = false;
-                        state.userTestResults = []; // Set to empty array on error to prevent undefined
-                    });
-                }
-            },
-
             saveAnswers: async (testResultId: number, answers: Answer[]) => {
-                set(state => { state.isLoading = true; state.error = null; });
+                set({ isLoading: true, error: null });
 
                 try {
-                    console.log(`Saving answers for test result ID: ${testResultId}`, answers);
-                    const response = await testService.saveAnswers(testResultId, answers);
-                    console.log('Save answers response:', response);
+                    // Ensure answers have all required properties for the backend
+                    const formattedAnswers = answers.map(answer => ({
+                        question_id: answer.question_id,
+                        selected_option_id: answer.selected_option_id,
+                        response_value: answer.selected_option_id, // Use the selected option ID as the response value
+                        is_tie_breaker: false
+                    }));
 
-                    set(state => { state.isLoading = false; });
+                    logDebug(`Saving ${formattedAnswers.length} answers for test result ${testResultId}`);
+
+                    const response = await testService.saveAnswers(testResultId, formattedAnswers);
+                    set({ isLoading: false });
+                    return response;
                 } catch (error: any) {
                     console.error('Error saving answers:', error);
-                    set(state => {
-                        state.error = error.message || 'Failed to save answers';
-                        state.isLoading = false;
+                    set({
+                        error: error.message || 'Failed to save answers',
+                        isLoading: false
                     });
+                    return null;
                 }
             },
 
-            completeTest: async (testResultId: number) => {
-                set(state => { state.isLoading = true; state.error = null; });
+            completeTest: async (testResultId: number): Promise<TestResult | null> => {
+                set({ isLoading: true, error: null });
 
                 try {
-                    console.log(`Completing test with ID: ${testResultId}`);
-                    const response = await testService.completeTest(testResultId);
-                    console.log('Complete test response:', response);
+                    logDebug(`Completing test with ID: ${testResultId}`);
+                    const result = await testService.completeTest(testResultId);
+                    logDebug('Complete test response:', result);
 
-                    set(state => {
-                        state.currentTestResult = response.data;
-                        state.isLoading = false;
+                    set({
+                        currentTestResult: result,
+                        isLoading: false
                     });
+
+                    return result;
                 } catch (error: any) {
                     console.error('Error completing test:', error);
-                    set(state => {
-                        state.error = error.message || 'Failed to complete test';
-                        state.isLoading = false;
+                    set({
+                        error: error.message || 'Failed to complete test',
+                        isLoading: false
                     });
+                    return null; // Return null instead of re-throwing
+                }
+            },
+
+            // New tie-breaking functionality
+            fetchTieBreakers: async (testResultId: number): Promise<Question[]> => {
+                set({ isLoading: true, error: null });
+
+                try {
+                    const response = await testService.getTieBreakers(testResultId);
+
+                    // Transform the tied_type_ids into the expected format
+                    const tiedTypeObjects = response.tied_type_ids.map(id => ({
+                        type_id: id,
+                        name: "", // You'll need to populate this from your data
+                        score: 0  // Default score
+                    }));
+
+                    set({
+                        tieBreakingQuestions: response.questions,
+                        tiedTypes: tiedTypeObjects,
+                        isTieBreaking: true,
+                        isLoading: false
+                    });
+
+                    return response.questions;
+                } catch (error: any) {
+                    console.error('Failed to fetch tie-breaking questions:', error);
+                    set({
+                        error: error.message || 'Failed to fetch tie-breaking questions',
+                        isLoading: false
+                    });
+                    return [];
+                }
+            },
+
+            saveTieBreakerAnswers: async (testResultId: number, answers: Answer[]): Promise<TestResult | null> => {
+                set({ isLoading: true, error: null });
+
+                try {
+                    // Mark these answers as tie breakers
+                    const tieBreakerAnswers = answers.map(answer => ({
+                        ...answer,
+                        is_tie_breaker: true
+                    }));
+
+                    const result = await testService.saveTieBreakerAnswers(testResultId, tieBreakerAnswers);
+
+                    set({
+                        currentTestResult: result,
+                        isTieBreaking: false,
+                        isLoading: false
+                    });
+
+                    return result;
+                } catch (error: any) {
+                    console.error('Failed to save tie-breaker answers:', error);
+                    set({
+                        error: error.message || 'Failed to save tie-breaker answers',
+                        isLoading: false
+                    });
+                    return null;
                 }
             }
-        })),
+        }),
         {
-            name: QUIZ_STORE,
+            name: 'test-store',
             partialize: (state) => ({
                 tests: state.tests,
                 currentTest: state.currentTest,

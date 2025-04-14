@@ -406,3 +406,38 @@
     }
   }
 }
+
+// Add this to your styles.scss file, or you can add it inline in your index.tsx
+// with the style tag as shown below
+
+// Test container form prevention styles
+.test-container {
+  /* Prevent any form submission behavior */
+  form {
+    pointer-events: none; /* Block form submission events */
+  }
+
+  /* But allow clicks on specific elements */
+  .questions__item,
+  .test-section__next-btn,
+  .test-section__back-btn,
+  .test-results-btn,
+  .radio-wrapper,
+  .questions__list {
+    pointer-events: auto !important;
+    cursor: pointer;
+  }
+
+  /* Ensure forms don't actually submit */
+  form[action], form[method] {
+    action: "javascript:void(0)";
+    method: "get";
+    onsubmit: "return false;";
+  }
+}
+
+// Fix for the micro-refresh that might be happening
+html, body {
+  overflow-anchor: none; /* Prevents browser from automatically scrolling when content changes */
+}
+

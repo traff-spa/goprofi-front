@@ -7,12 +7,63 @@ export interface PersonalityType {
     short_code?: string;
 }
 
+// Define response shapes based on actual backend responses
+export interface TestsResponse {
+    tests: Test[];
+}
+
+export interface TestQuestionsResponse {
+    test_id: number;
+    test_name: string;
+    questions: Question[];
+}
+
+export interface SaveAnswersResponse {
+    message: string;
+    test_result_id: number;
+}
+
+export interface TieBreakersResponse {
+    test_result_id: string;
+    tied_type_ids: number[];
+    questions: Question[];
+}
+
 export interface TypeScore {
     type_id: number;
     name: string;
     score: number;
     percentage: number;
     questions: number;
+}
+
+export interface TestStore {
+    tests: Test[];
+    currentTest: Test | null;
+    currentTestResult: TestResult | null;
+    currentTestQuestions: Question[];
+    currentTestName: string;
+    userTestResults: TestResult[];
+    isLoading: boolean;
+    error: string | null;
+    // New tie-breaking properties
+    tieBreakingQuestions: Question[];
+    tiedTypes: { type_id: number; name: string; score: number; }[];
+    isTieBreaking: boolean;
+
+    // Actions
+    resetCurrentTest: () => void;
+    fetchAllTests: () => Promise<Test[]>;
+    fetchTestById: (id: number) => Promise<Test | null>;
+    fetchTestQuestions: (testId: number) => Promise<Question[]>;
+    fetchTestResult: (id: number) => Promise<TestResult | null>;
+    fetchUserTestResults: (userId: number) => Promise<TestResult[]>;
+    startTest: (userId: number, testId: number) => Promise<TestResult | null>;
+    saveAnswers: (testResultId: number, answers: Answer[]) => Promise<any>;
+    completeTest: (testResultId: number) => Promise<TestResult | null>;
+    // New tie-breaking functions
+    fetchTieBreakers: (testResultId: number) => Promise<Question[]>;
+    saveTieBreakerAnswers: (testResultId: number, answers: Answer[]) => Promise<TestResult | null>;
 }
 
 export interface ResultData {
@@ -36,28 +87,6 @@ export interface ResultData {
         score: number;
     }[];
     requires_tie_breaker?: boolean;
-}
-
-export interface TestStore {
-    tests: Test[];
-    currentTest: Test | null;
-    currentTestResult: TestResult | null;
-    currentTestQuestions: Question[];
-    currentTestName: string;
-    userTestResults: TestResult[];
-    isLoading: boolean;
-    error: string | null;
-
-    // Actions
-    resetCurrentTest: () => void;
-    fetchAllTests: () => Promise<void>;
-    fetchTestById: (id: number) => Promise<void>;
-    fetchTestQuestions: (testId: number) => Promise<Question[]>;
-    fetchTestResult: (id: number) => Promise<void>;
-    fetchUserTestResults: (userId: number) => Promise<void>;
-    startTest: (userId: number, testId: number) => Promise<TestResult | null>;
-    saveAnswers: (testResultId: number, answers: Answer[]) => Promise<void>;
-    completeTest: (testResultId: number) => Promise<void>;
 }
 
 export interface TestResult {
