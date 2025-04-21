@@ -64,6 +64,7 @@ export interface TestStore {
     // New tie-breaking functions
     fetchTieBreakers: (testResultId: number) => Promise<Question[]>;
     saveTieBreakerAnswers: (testResultId: number, answers: Answer[]) => Promise<TestResult | null>;
+    lastSavedAnswerTimestamp: number
 }
 
 export interface ResultData {

@@ -5,7 +5,6 @@ import {useUserStore} from "@/store.ts";
 import {AuthState} from '@/app/types';
 import {authService} from '@/app/api/services';
 
-
 export const useAuthStore = create<AuthState>()(
     persist(
         (set) => ({
@@ -16,22 +15,19 @@ export const useAuthStore = create<AuthState>()(
 
             setUser: (user) => {
                 set({user, isAuthenticated: true});
-                useUserStore.getState().setUser(user);
+                useUserStore.setState({user, isAuthenticated: true});
             },
 
             clearUser: () => {
                 localStorage.removeItem('auth_token');
                 set({user: null, isAuthenticated: false});
-
-                useUserStore.getState().clearUser();
+                useUserStore.setState({user: null, isAuthenticated: false});
             },
 
             login: async (email, password) => {
                 try {
                     set({isLoading: true, error: null});
-                    console.log('Login request with:', {email, password});
                     const response = await authService.login({email, password});
-                    console.log('Login response user:', response.user);
 
                     localStorage.setItem('auth_token', response.token);
                     set({
@@ -40,9 +36,8 @@ export const useAuthStore = create<AuthState>()(
                         isLoading: false,
                     });
 
-                    useUserStore.getState().setUser(response.user);
+                    useUserStore.setState({user: response.user, isAuthenticated: true});
                 } catch (error: any) {
-                    console.error('Login error in store:', error);
                     set({
                         error: error.message || 'Login failed',
                         isLoading: false,
@@ -67,7 +62,7 @@ export const useAuthStore = create<AuthState>()(
                         isLoading: false,
                     });
 
-                    useUserStore.getState().setUser(response.user);
+                    useUserStore.setState({user: response.user, isAuthenticated: true});
                 } catch (error: any) {
                     set({
                         error: error.message || 'Registration failed',
@@ -78,13 +73,11 @@ export const useAuthStore = create<AuthState>()(
             },
 
             loginWithGoogle: () => {
-                console.log('Starting Google login flow from store');
                 set({isLoading: true, error: null});
                 try {
                     authService.loginWithGoogle();
                     // No need to update state here as page will redirect
                 } catch (error: any) {
-                    console.error('Google login initiation failed:', error);
                     set({
                         error: error.message || 'Google login failed',
                         isLoading: false,
@@ -96,7 +89,6 @@ export const useAuthStore = create<AuthState>()(
             handleGoogleCallback: async (token: string) => {
                 try {
                     set({isLoading: true, error: null});
-                    console.log('Handling Google callback with token');
 
                     // Save token
                     localStorage.setItem('auth_token', token);
@@ -110,9 +102,8 @@ export const useAuthStore = create<AuthState>()(
                         isLoading: false,
                     });
 
-                    useUserStore.getState().setUser(user);
+                    useUserStore.setState({user, isAuthenticated: true});
                 } catch (error: any) {
-                    console.error('Google callback handling failed:', error);
                     set({
                         error: error.message || 'Failed to process Google login',
                         isLoading: false,
@@ -137,7 +128,7 @@ export const useAuthStore = create<AuthState>()(
                         isLoading: false,
                     });
 
-                    useUserStore.getState().setUser(user);
+                    useUserStore.setState({user, isAuthenticated: true});
                 } catch (error) {
                     localStorage.removeItem('auth_token');
                     set({
@@ -157,7 +148,7 @@ export const useAuthStore = create<AuthState>()(
                 });
 
                 // Sync with global user store
-                useUserStore.getState().clearUser();
+                useUserStore.setState({user: null, isAuthenticated: false});
             },
 
             clearError: () => {

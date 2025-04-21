@@ -13,8 +13,7 @@ const AuthPage = lazy(() => import('@/app/pages/Auth'));
 const ProfilePage = lazy(() => import('@/app/pages/Profile'));
 const TestHistoryPage = lazy(() => import('@/app/pages/TestHistory'));
 const TestPage = lazy(() => import('@/app/pages/Test'));
-// const TestResultPage = lazy(() => import('@/app/pages/TestResult'));
-// const TestsListPage = lazy(() => import('@/app/pages/TestList'));
+const TestResultPage = lazy(() => import('@/app/pages/TestResult'));
 const NotFoundPage = lazy(() => import('@/app/pages/NotFound'));
 
 export const AppRoutes = () => {
@@ -58,8 +57,7 @@ export const AppRoutes = () => {
                     path={`${ROUTES.TEST_HISTORY}/:id`}
                     element={
                         <PrivateRoute>
-                            <div>testResultPage</div>
-                            {/*<TestResultPage />*/}
+                            <TestResultPage />
                         </PrivateRoute>
                     }
                 />
@@ -75,8 +73,7 @@ export const AppRoutes = () => {
                     path="/results/:id"
                     element={
                         <PrivateRoute>
-                            <div>testResultPage</div>
-                            {/*<TestResultPage />*/}
+                            <TestResultPage />
                         </PrivateRoute>
                     }
                 />

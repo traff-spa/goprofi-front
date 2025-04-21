@@ -1,4 +1,4 @@
-import React, { useState, FC, useEffect, useCallback } from 'react';
+import React, { useState, FC, useEffect, useCallback, useRef } from 'react';
 import '@app/styles/test.scss';
 import ArrowIcon from '@/assets/icons/arrow-right.svg?react';
 import { useTestStore } from '@/store/testStore';
@@ -18,21 +18,44 @@ const TestStepper: FC<Props> = ({ testResultId, setCompleted, initialAnswers = {
   const [answeredQuestionsCount, setAnsweredQuestionsCount] = useState(Object.keys(initialAnswers).length);
   const [loading, setLoading] = useState(false);
 
-  // Find the first unanswered question
+  // Use refs to track current state for use in callbacks
+  const stepRef = useRef(currentStep);
+  const questionsRef = useRef(currentTestQuestions);
+  const localAnswersRef = useRef(localAnswers);
+
+  // Update refs when values change
+  useEffect(() => {
+    stepRef.current = currentStep;
+  }, [currentStep]);
+
+  useEffect(() => {
+    questionsRef.current = currentTestQuestions;
+  }, [currentTestQuestions]);
+
+  useEffect(() => {
+    localAnswersRef.current = localAnswers;
+  }, [localAnswers]);
+
+  // Find the first unanswered question on initial load only
   useEffect(() => {
     if (currentTestQuestions.length > 0 && Object.keys(initialAnswers).length > 0) {
+      let foundUnanswered = false;
+
       for (let i = 0; i < currentTestQuestions.length; i++) {
         const question = currentTestQuestions[i];
         if (!initialAnswers[question.id]) {
           setCurrentStep(i);
-          return;
+          foundUnanswered = true;
+          break;
         }
       }
 
       // If all questions are answered, position at the last question
-      setCurrentStep(currentTestQuestions.length - 1);
+      if (!foundUnanswered) {
+        setCurrentStep(currentTestQuestions.length - 1);
+      }
     }
-  }, [currentTestQuestions, initialAnswers]);
+  }, [currentTestQuestions.length, initialAnswers]); // Include initialAnswers in dependency array
 
   // Sync progress with answer count when needed
   useEffect(() => {
@@ -55,65 +78,85 @@ const TestStepper: FC<Props> = ({ testResultId, setCompleted, initialAnswers = {
 
     // Track number of answered questions more efficiently
     const wasAlreadyAnswered = initialAnswers[questionId] !== undefined ||
-        Object.prototype.hasOwnProperty.call(localAnswers, questionId);
+        Object.prototype.hasOwnProperty.call(localAnswersRef.current, questionId);
 
     if (!wasAlreadyAnswered) {
       setAnsweredQuestionsCount(prev => prev + 1);
     }
-  }, [loading, initialAnswers, testResultId, localAnswers]);
+  }, [loading, initialAnswers, testResultId]);
 
   const handleNext = useCallback(async (e: React.MouseEvent<HTMLButtonElement>) => {
-    // FIXED: Better event prevention to ensure no form submission
-    if (e && e.preventDefault) {
-      e.preventDefault();
-    }
-    if (e && e.stopPropagation) {
-      e.stopPropagation();
-    }
+    e.preventDefault();
+    e.stopPropagation();
 
     if (loading) return;
-
-    const currentQuestion = currentTestQuestions[currentStep];
-    if (!currentQuestion) return;
-
-    const selectedOptionId = localAnswers[currentQuestion.id];
-    if (!selectedOptionId) return;
-
     setLoading(true);
 
     try {
-      // Save the answer
+      // Use ref values to avoid closure issues
+      const currentStepValue = stepRef.current;
+      const questions = questionsRef.current;
+      const answers = localAnswersRef.current;
+
+      if (!questions.length) {
+        setLoading(false);
+        return;
+      }
+
+      const currentQuestion = questions[currentStepValue];
+      if (!currentQuestion) {
+        setLoading(false);
+        return;
+      }
+
+      const selectedOptionId = answers[currentQuestion.id];
+      if (!selectedOptionId) {
+        setLoading(false);
+        return;
+      }
+
+      // Prepare the answer to save
       const answersToSave = [{
         question_id: currentQuestion.id,
         selected_option_id: selectedOptionId
       }];
 
-      await saveAnswers(testResultId, answersToSave);
+      // Check if this is the last question
+      const isLastQuestion = currentStepValue >= questions.length - 1;
 
-      // CRITICAL FIX: Move to next question immediately after saving
-      if (currentStep < currentTestQuestions.length - 1) {
-        setCurrentStep(prevStep => prevStep + 1);
-      } else {
-        setCompleted(true);
+      // First save the answer
+      const saveResponse = await saveAnswers(testResultId, answersToSave);
+
+      if (!saveResponse) {
+        throw new Error('Failed to save answer');
       }
 
-      // Update test result in background (don't wait for it)
-      fetchTestResult(testResultId).catch(err => console.error("Error updating test result:", err));
+      // Update test result to ensure store is synced
+      await fetchTestResult(testResultId);
 
+      // Important: Only update after server operations are complete
+      if (!isLastQuestion) {
+        // Move to the next question
+        setCurrentStep(prev => prev + 1);
+      } else {
+        // We've reached the end
+        setCompleted(true);
+      }
     } catch (error) {
-      console.error("Error saving answer:", error);
+      console.error("Error in handleNext:", error);
+      alert('Failed to save your answer. Please try again.');
     } finally {
       setLoading(false);
     }
-  }, [currentStep, currentTestQuestions, localAnswers, saveAnswers, testResultId, fetchTestResult, setCompleted, loading]);
+  }, [saveAnswers, fetchTestResult, testResultId, setCompleted, loading]);
 
-  // Simple back button
+  // Handle back button
   const handleBack = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
-    if (currentStep > 0 && !loading) {
-      setCurrentStep(prevStep => prevStep - 1);
+    if (stepRef.current > 0 && !loading) {
+      setCurrentStep(prev => prev - 1);
     }
-  }, [currentStep, loading]);
+  }, [loading]);
 
   // Loading state
   if (currentTestQuestions.length === 0) {

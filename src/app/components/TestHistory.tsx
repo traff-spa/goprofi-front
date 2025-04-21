@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import ArrowIcon from '@/assets/icons/arrow-right.svg?react';
 
-// Import directly from the individual stores
 import { useAuthStore } from '@/store/authStore';
 import { useTestStore } from '@/store/testStore';
 
@@ -47,7 +46,7 @@ export const TestHistory: React.FC = () => {
         };
 
         loadTestResults();
-    }, [user, navigate, fetchUserTestResults]); // Don't include userTestResults here
+    }, [user, navigate, fetchUserTestResults]);
 
     // Format date to DD.MM.YYYY
     const formatDate = (dateString: Date | string): string => {
@@ -127,7 +126,7 @@ export const TestHistory: React.FC = () => {
                                         to={test.completed_at ? `/results/${test.id}` : `/test/${test.id}`}
                                         className={!test.completed_at ? 'test-history__link in-progress' : 'test-history__link'}
                                     >
-                                        {test.completed_at ? 'Результат теста' : 'Продовжити тест'}
+                                        {test.completed_at ? 'Результат тесту' : 'Продовжити тест'}
                                         {!test.completed_at && <ArrowIcon width={17} height={12} />}
                                     </Link>
                                 </div>

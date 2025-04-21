@@ -7,7 +7,8 @@ import type {
     TestsResponse,
     TestQuestionsResponse,
     SaveAnswersResponse,
-    TieBreakersResponse
+    TieBreakersResponse,
+    Question
 } from '@/app/types';
 
 export const testService = {
@@ -23,6 +24,14 @@ export const testService = {
             method: 'GET',
         }),
 
+    // New method to get a single question by ID
+    getQuestionById: (id: number) =>
+        request<Question>({
+            url: `/questions/${id}`,
+            method: 'GET',
+        }),
+
+    // Original method - keep for compatibility
     getTestQuestions: (testId: number) => {
         return request<TestQuestionsResponse>({
             url: `/tests/${testId}/questions`,
@@ -83,7 +92,7 @@ export const testService = {
         });
     },
 
-    // New methods for tie-breaking functionality
+    // Tie-breaking functionality
     getTieBreakers: (testResultId: number) => {
         return request<TieBreakersResponse>({
             url: `/test-results/${testResultId}/tie-breaker`,

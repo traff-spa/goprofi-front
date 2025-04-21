@@ -1,10 +1,11 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { useNavigate, useParams } from 'react-router-dom';
 import '@app/styles/test.scss'
 import TestStepper from '@app/components/TestStepper'
 import { useTestStore } from '@/store/testStore';
 import { useAuthStore } from '@/store/authStore';
 import { ROUTES } from '@/app/routes/paths';
+import TestResult from "@app/pages/TestResult";
 
 const Test = () => {
   const { id } = useParams<{ id: string }>();
@@ -12,7 +13,6 @@ const Test = () => {
   const { user } = useAuthStore();
   const {
     currentTestResult,
-    completeTest,
     resetCurrentTest,
     currentTestQuestions,
     fetchTestResult,
@@ -25,56 +25,32 @@ const Test = () => {
   const [initialAnswers, setInitialAnswers] = useState<{[key: number]: number}>({});
   const [isLoadingAnswers, setIsLoadingAnswers] = useState<boolean>(true);
   const dataFetched = useRef(false);
+  // Add a mount reference to prevent state updates after unmount
+  const isMounted = useRef(true);
 
-
+  // Set the mounted ref on initial render and handle cleanup
   useEffect(() => {
-    // If there's no user, redirect to login
+    isMounted.current = true;
+
+    // Fix the nested cleanup issue by moving the timeout to here
+    return () => {
+      isMounted.current = false;
+      // Safely reset test state with a slight delay to avoid conflicts
+      setTimeout(() => {
+        resetCurrentTest();
+      }, 100);
+    };
+  }, [resetCurrentTest]); // Include resetCurrentTest in dependency array
+
+  // Separate auth check from data loading to avoid race conditions
+  useEffect(() => {
     if (!user) {
       navigate(ROUTES.AUTH);
-      return;
     }
+  }, [user, navigate]);
 
-    // Load test data and find saved answers - MINIMAL CHANGES
-    const loadTestData = async () => {
-      if (id && !dataFetched.current) {
-        dataFetched.current = true; // Mark as fetched to prevent multiple calls
-
-        try {
-          setIsLoadingAnswers(true);
-          console.log(`Loading test data for test result ID: ${id}`);
-
-          // First fetch the test result
-          const testResult = await fetchTestResult(parseInt(id, 10));
-
-          if (testResult) {
-            // Then fetch the questions for this test
-            await fetchTestQuestions(testResult.test_id);
-
-            // Get saved answers
-            const savedAnswers = await fetchUserAnswers(testResult.id);
-            setInitialAnswers(savedAnswers);
-          }
-
-          setIsLoadingAnswers(false);
-        } catch (error) {
-          console.error('Failed to load test data:', error);
-          setIsLoadingAnswers(false);
-          dataFetched.current = false; // Reset on error to allow retrying
-        }
-      }
-    };
-
-    loadTestData();
-
-    // CRITICAL FIX: Only reset the test on actual component unmount
-    return () => {
-      // When navigating away, safely reset the test state
-      setTimeout(() => resetCurrentTest(), 100);
-    };
-  }, [id, user, navigate, resetCurrentTest, fetchTestResult, fetchTestQuestions]);
-
-  // Fetch user's answers
-  const fetchUserAnswers = async (testResultId: number) => {
+  // Fetch user's answers - extracted as a separate function for clarity
+  const fetchUserAnswers = useCallback(async (testResultId: number) => {
     try {
       // Check localStorage first
       const savedAnswersKey = `test_${testResultId}_answers`;
@@ -88,39 +64,64 @@ const Test = () => {
         }
       }
 
-      // If there's progress but no saved answers, create dummy answers
-      if (currentTestResult?.progress && currentTestQuestions.length > 0) {
-        const answeredCount = Math.floor((currentTestQuestions.length * currentTestResult.progress) / 100);
-        const dummyAnswers: {[key: number]: number} = {};
-
-        for (let i = 0; i < answeredCount && i < currentTestQuestions.length; i++) {
-          const question = currentTestQuestions[i];
-          if (question.options.length > 0) {
-            dummyAnswers[question.id] = question.options[0].id;
-          }
-        }
-
-        return dummyAnswers;
-      }
-
+      // If no saved answers, return empty object
       return {};
     } catch (error) {
       console.error("Error fetching user answers:", error);
       return {};
     }
-  };
+  }, []);
 
-  const handleTestCompletion = async () => {
-    if (currentTestResult) {
-      try {
-        await completeTest(currentTestResult.id);
-        navigate(`/results/${currentTestResult.id}`);
-      } catch (error) {
-        console.error('Failed to complete test', error);
-      }
+  // Data loading effect - separated for clarity
+  useEffect(() => {
+    // Prevent execution if user is not authenticated or already fetched
+    if (!user || !id || dataFetched.current) {
+      return;
     }
-  }
 
+    const loadTestData = async () => {
+      try {
+        dataFetched.current = true;
+        setIsLoadingAnswers(true);
+
+        // First fetch the test result
+        const testResult = await fetchTestResult(parseInt(id, 10));
+
+        // Only continue if component is still mounted
+        if (!isMounted.current) return;
+
+        if (testResult) {
+          // Fetch questions for this test
+          await fetchTestQuestions(testResult.test_id);
+
+          // Only continue if component is still mounted
+          if (!isMounted.current) return;
+
+          // Get saved answers from localStorage
+          const savedAnswers = await fetchUserAnswers(testResult.id);
+
+          // Only set state if component is still mounted
+          if (isMounted.current) {
+            setInitialAnswers(savedAnswers);
+            setIsLoadingAnswers(false);
+          }
+        } else if (isMounted.current) {
+          setIsLoadingAnswers(false);
+          dataFetched.current = false; // Reset so we can try again
+        }
+      } catch (error) {
+        console.error('Failed to load test data:', error);
+        if (isMounted.current) {
+          setIsLoadingAnswers(false);
+          dataFetched.current = false; // Reset on error to allow retrying
+        }
+      }
+    };
+
+    loadTestData();
+  }, [id, user, fetchTestResult, fetchTestQuestions, fetchUserAnswers]);
+
+  // Loading state
   if (isLoading || isLoadingAnswers) {
     return (
         <div className="test-container">
@@ -129,6 +130,7 @@ const Test = () => {
     );
   }
 
+  // Error state
   if (error || !currentTestResult || currentTestQuestions.length === 0) {
     return (
         <div className="test-container">
@@ -147,6 +149,7 @@ const Test = () => {
     );
   }
 
+  // Render test or completion screen
   return (
       <div className="test-container">
         {!isCompleted ? (
@@ -157,19 +160,11 @@ const Test = () => {
             />
         ) : (
             <div className="test-completion">
-              <h2>Тест завершено</h2>
-              <p>Дякуємо за проходження тесту!</p>
-              <button
-                  type="button"
-                  onClick={handleTestCompletion}
-                  className="test-results-btn"
-              >
-                Переглянути результати
-              </button>
+              <TestResult/>
             </div>
         )}
       </div>
-  )
-}
+  );
+};
 
 export default Test;

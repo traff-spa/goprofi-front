@@ -10,13 +10,6 @@ import type {
     Test
 } from '@/app/types';
 
-// Utility for conditional logging - only logs in development
-const logDebug = (message: string, data?: any) => {
-    if (process.env.NODE_ENV !== 'production') {
-        console.log(message, data !== undefined ? data : '');
-    }
-};
-
 // Initial state definition
 const initialState = {
     tests: [],
@@ -27,10 +20,12 @@ const initialState = {
     userTestResults: [],
     isLoading: false,
     error: null,
-    // New tie-breaking properties
+    // Tie-breaking properties
     tieBreakingQuestions: [],
     tiedTypes: [],
     isTieBreaking: false,
+    // Track when answers are saved to force UI updates
+    lastSavedAnswerTimestamp: 0,
 };
 
 export const useTestStore = create<TestStore>()(
@@ -44,6 +39,7 @@ export const useTestStore = create<TestStore>()(
                     currentTestResult: null,
                     currentTestQuestions: [],
                     currentTestName: '',
+                    lastSavedAnswerTimestamp: 0,
                 });
             },
 
@@ -51,15 +47,11 @@ export const useTestStore = create<TestStore>()(
                 set({ isLoading: true, error: null });
 
                 try {
-                    logDebug(`Starting test for user ${userId}, test ID: ${testId}`);
-
                     // Start the test first
                     const testResult = await testService.startTest(userId, testId);
-                    logDebug('Test Result Response:', testResult);
 
                     // Fetch the questions
                     const questionsResponse = await testService.getTestQuestions(testId);
-                    logDebug('Questions Response:', questionsResponse);
 
                     // Ensure we have a valid questions response
                     if (!questionsResponse?.questions || !questionsResponse?.test_name) {
@@ -70,12 +62,12 @@ export const useTestStore = create<TestStore>()(
                         currentTestResult: testResult,
                         currentTestQuestions: questionsResponse.questions,
                         currentTestName: questionsResponse.test_name,
-                        isLoading: false
+                        isLoading: false,
+                        lastSavedAnswerTimestamp: Date.now(),
                     });
 
                     return testResult;
                 } catch (error: any) {
-                    console.error('Error in startTest:', error);
                     set({
                         error: error.message || 'Failed to start test',
                         isLoading: false
@@ -89,7 +81,6 @@ export const useTestStore = create<TestStore>()(
 
                 try {
                     const response = await testService.getAllTests();
-                    logDebug('All tests response:', response);
 
                     set({
                         tests: response.tests,
@@ -98,12 +89,11 @@ export const useTestStore = create<TestStore>()(
 
                     return response.tests;
                 } catch (error: any) {
-                    console.error('Error fetching all tests:', error);
                     set({
                         error: error.message || 'Failed to fetch tests',
                         isLoading: false
                     });
-                    return []; // Return empty array instead of null
+                    return [];
                 }
             },
 
@@ -112,7 +102,6 @@ export const useTestStore = create<TestStore>()(
 
                 try {
                     const test = await testService.getTestById(id);
-                    logDebug('Fetched test by ID:', test);
 
                     set({
                         currentTest: test,
@@ -121,7 +110,6 @@ export const useTestStore = create<TestStore>()(
 
                     return test;
                 } catch (error: any) {
-                    console.error('Error fetching test by ID:', error);
                     set({
                         error: error.message || 'Failed to fetch test',
                         isLoading: false
@@ -135,7 +123,6 @@ export const useTestStore = create<TestStore>()(
 
                 try {
                     const questionsResponse = await testService.getTestQuestions(testId);
-                    logDebug('Fetched questions response:', questionsResponse);
 
                     set({
                         currentTestQuestions: questionsResponse.questions,
@@ -145,12 +132,11 @@ export const useTestStore = create<TestStore>()(
 
                     return questionsResponse.questions;
                 } catch (error: any) {
-                    console.error('Error fetching test questions:', error);
                     set({
                         error: error.message || 'Failed to fetch test questions',
                         isLoading: false
                     });
-                    return []; // Return empty array instead of null
+                    return [];
                 }
             },
 
@@ -158,9 +144,7 @@ export const useTestStore = create<TestStore>()(
                 set({ isLoading: true, error: null });
 
                 try {
-                    logDebug(`Fetching test result for ID: ${id}`);
                     const testResult = await testService.getTestResult(id);
-                    logDebug('Fetched test result:', testResult);
 
                     set({
                         currentTestResult: testResult,
@@ -169,7 +153,6 @@ export const useTestStore = create<TestStore>()(
 
                     return testResult;
                 } catch (error: any) {
-                    console.error('Error fetching test result:', error);
                     set({
                         error: error.message || 'Failed to fetch test result',
                         isLoading: false
@@ -191,7 +174,6 @@ export const useTestStore = create<TestStore>()(
 
                     return results;
                 } catch (error: any) {
-                    console.error('Error fetching user test results:', error);
                     set({
                         error: error.message || 'Failed to fetch test history',
                         isLoading: false,
@@ -209,17 +191,20 @@ export const useTestStore = create<TestStore>()(
                     const formattedAnswers = answers.map(answer => ({
                         question_id: answer.question_id,
                         selected_option_id: answer.selected_option_id,
-                        response_value: answer.selected_option_id, // Use the selected option ID as the response value
+                        response_value: answer.selected_option_id,
                         is_tie_breaker: false
                     }));
 
-                    logDebug(`Saving ${formattedAnswers.length} answers for test result ${testResultId}`);
-
                     const response = await testService.saveAnswers(testResultId, formattedAnswers);
-                    set({ isLoading: false });
+
+                    // Update timestamp to force components to re-render
+                    set({
+                        isLoading: false,
+                        lastSavedAnswerTimestamp: Date.now()
+                    });
+
                     return response;
                 } catch (error: any) {
-                    console.error('Error saving answers:', error);
                     set({
                         error: error.message || 'Failed to save answers',
                         isLoading: false
@@ -232,9 +217,7 @@ export const useTestStore = create<TestStore>()(
                 set({ isLoading: true, error: null });
 
                 try {
-                    logDebug(`Completing test with ID: ${testResultId}`);
                     const result = await testService.completeTest(testResultId);
-                    logDebug('Complete test response:', result);
 
                     set({
                         currentTestResult: result,
@@ -243,16 +226,15 @@ export const useTestStore = create<TestStore>()(
 
                     return result;
                 } catch (error: any) {
-                    console.error('Error completing test:', error);
                     set({
                         error: error.message || 'Failed to complete test',
                         isLoading: false
                     });
-                    return null; // Return null instead of re-throwing
+                    return null;
                 }
             },
 
-            // New tie-breaking functionality
+            // Tie-breaking functionality
             fetchTieBreakers: async (testResultId: number): Promise<Question[]> => {
                 set({ isLoading: true, error: null });
 
@@ -275,7 +257,6 @@ export const useTestStore = create<TestStore>()(
 
                     return response.questions;
                 } catch (error: any) {
-                    console.error('Failed to fetch tie-breaking questions:', error);
                     set({
                         error: error.message || 'Failed to fetch tie-breaking questions',
                         isLoading: false
@@ -299,19 +280,22 @@ export const useTestStore = create<TestStore>()(
                     set({
                         currentTestResult: result,
                         isTieBreaking: false,
-                        isLoading: false
+                        isLoading: false,
+                        lastSavedAnswerTimestamp: Date.now()
                     });
 
                     return result;
                 } catch (error: any) {
-                    console.error('Failed to save tie-breaker answers:', error);
                     set({
                         error: error.message || 'Failed to save tie-breaker answers',
                         isLoading: false
                     });
                     return null;
                 }
-            }
+            },
+
+            // Add the timestamp field to the store state
+            lastSavedAnswerTimestamp: initialState.lastSavedAnswerTimestamp
         }),
         {
             name: 'test-store',
@@ -325,10 +309,20 @@ export const useTestStore = create<TestStore>()(
     )
 );
 
-// Optional selector hooks for better component performance
+// Selector hooks with proper dependencies to trigger re-renders
 export const useTests = () => useTestStore(state => state.tests);
 export const useCurrentTest = () => useTestStore(state => state.currentTest);
 export const useCurrentTestResult = () => useTestStore(state => state.currentTestResult);
-export const useCurrentTestQuestions = () => useTestStore(state => state.currentTestQuestions);
+
+// This selector now properly includes the timestamp in its dependencies
+export const useCurrentTestQuestions = () => {
+    const store = useTestStore(state => ({
+        questions: state.currentTestQuestions,
+        timestamp: state.lastSavedAnswerTimestamp
+    }));
+    // Return just the questions - the timestamp is only used to force re-renders
+    return store.questions;
+};
+
 export const useTestLoading = () => useTestStore(state => state.isLoading);
 export const useTestError = () => useTestStore(state => state.error);
