@@ -5,6 +5,7 @@ import { useAuthStore } from '@/store/authStore';
 import { ROUTES } from '@/app/routes/paths';
 import { getProfessionsForType, getTypeDetails } from '@app/helpers/professions';
 import '@app/styles/test.scss';
+import {formatDate} from '../helpers/dateHelpers'
 
 const TestResult: React.FC = () => {
     const { id } = useParams<{ id: string }>();
@@ -23,12 +24,6 @@ const TestResult: React.FC = () => {
         }
     }, [id, user, navigate, fetchTestResult]);
 
-    // Format date to DD.MM.YYYY
-    const formatDate = (dateString: Date | string | null): string => {
-        if (!dateString) return '';
-        const date = new Date(dateString);
-        return `${date.getDate().toString().padStart(2, '0')}.${(date.getMonth() + 1).toString().padStart(2, '0')}.${date.getFullYear()}`;
-    };
 
     if (isLoading) {
         return <div className="test-container">Завантаження результатів тесту...</div>;
@@ -135,17 +130,7 @@ const TestResult: React.FC = () => {
             <div style={{ textAlign: 'center', marginTop: '20px', marginBottom: '40px' }}>
                 <button
                     onClick={() => navigate(ROUTES.MAIN)}
-                    style={{
-                        background: 'none',
-                        border: 'none',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '5px',
-                        margin: '0 auto',
-                        color: '#4c4b4a',
-                        cursor: 'pointer',
-                        fontSize: '16px'
-                    }}
+                    className='testResultButton'
                 >
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path d="M20 12H4M4 12L10 18M4 12L10 6" stroke="#4c4b4a" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>

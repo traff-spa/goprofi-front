@@ -6,19 +6,7 @@ import useGetViewport from '@app/hooks/useGetViewport';
 import { useAuthStore } from '@/store/authStore';
 import { ROUTES } from '@/app/routes/paths';
 import { authService } from '@/app/api/services';
-
-type FieldLoginType = {
-  email: string;
-  password: string;
-}
-
-type FieldRegistrationType = {
-  email: string;
-  password: string;
-  confirmPassword: string;
-  firstName?: string;
-  lastName?: string;
-}
+import type {FieldLoginType, FieldRegistrationType} from '@app/types/auth.ts'
 
 const Auth = () => {
   const [isLoginMode, setIsLoginMode] = useState(true);

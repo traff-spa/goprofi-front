@@ -38,8 +38,6 @@ export const authService = {
         window.location.href = googleAuthUrl;
     },
 
-    // For connecting a Google account to an existing account - this initiates
-    // the OAuth flow with a special flag for the backend
     connectGoogleAccount: () => {
         const token = localStorage.getItem('auth_token');
 

@@ -25,31 +25,22 @@ const Test = () => {
   const [initialAnswers, setInitialAnswers] = useState<{[key: number]: number}>({});
   const [isLoadingAnswers, setIsLoadingAnswers] = useState<boolean>(true);
   const dataFetched = useRef(false);
-  // Add a mount reference to prevent state updates after unmount
-  const isMounted = useRef(true);
 
-  // Set the mounted ref on initial render and handle cleanup
   useEffect(() => {
-    isMounted.current = true;
-
-    // Fix the nested cleanup issue by moving the timeout to here
     return () => {
-      isMounted.current = false;
-      // Safely reset test state with a slight delay to avoid conflicts
-      setTimeout(() => {
+      // Only reset if we are actually navigating away from the test page
+      if (!isCompleted) {
         resetCurrentTest();
-      }, 100);
+      }
     };
-  }, [resetCurrentTest]); // Include resetCurrentTest in dependency array
+  }, [resetCurrentTest, isCompleted]);
 
-  // Separate auth check from data loading to avoid race conditions
   useEffect(() => {
     if (!user) {
       navigate(ROUTES.AUTH);
     }
   }, [user, navigate]);
 
-  // Fetch user's answers - extracted as a separate function for clarity
   const fetchUserAnswers = useCallback(async (testResultId: number) => {
     try {
       // Check localStorage first
@@ -72,10 +63,10 @@ const Test = () => {
     }
   }, []);
 
-  // Data loading effect - separated for clarity
   useEffect(() => {
     // Prevent execution if user is not authenticated or already fetched
-    if (!user || !id || dataFetched.current) {
+    // Or if test is already completed (don't reload test data in completed state)
+    if (!user || !id || dataFetched.current || isCompleted) {
       return;
     }
 
@@ -87,39 +78,28 @@ const Test = () => {
         // First fetch the test result
         const testResult = await fetchTestResult(parseInt(id, 10));
 
-        // Only continue if component is still mounted
-        if (!isMounted.current) return;
-
         if (testResult) {
           // Fetch questions for this test
           await fetchTestQuestions(testResult.test_id);
 
-          // Only continue if component is still mounted
-          if (!isMounted.current) return;
-
           // Get saved answers from localStorage
           const savedAnswers = await fetchUserAnswers(testResult.id);
 
-          // Only set state if component is still mounted
-          if (isMounted.current) {
-            setInitialAnswers(savedAnswers);
-            setIsLoadingAnswers(false);
-          }
-        } else if (isMounted.current) {
+          setInitialAnswers(savedAnswers);
+          setIsLoadingAnswers(false);
+        } else {
           setIsLoadingAnswers(false);
           dataFetched.current = false; // Reset so we can try again
         }
       } catch (error) {
         console.error('Failed to load test data:', error);
-        if (isMounted.current) {
-          setIsLoadingAnswers(false);
-          dataFetched.current = false; // Reset on error to allow retrying
-        }
+        setIsLoadingAnswers(false);
+        dataFetched.current = false; // Reset on error to allow retrying
       }
     };
 
     loadTestData();
-  }, [id, user, fetchTestResult, fetchTestQuestions, fetchUserAnswers]);
+  }, [id, user, fetchTestResult, fetchTestQuestions, fetchUserAnswers, isCompleted]);
 
   // Loading state
   if (isLoading || isLoadingAnswers) {
@@ -159,9 +139,7 @@ const Test = () => {
                 initialAnswers={initialAnswers}
             />
         ) : (
-            <div className="test-completion">
-              <TestResult/>
-            </div>
+            <TestResult />
         )}
       </div>
   );

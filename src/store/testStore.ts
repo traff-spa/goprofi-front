@@ -26,11 +26,12 @@ const initialState = {
     isTieBreaking: false,
     // Track when answers are saved to force UI updates
     lastSavedAnswerTimestamp: 0,
+    testPositions: {}
 };
 
 export const useTestStore = create<TestStore>()(
     persist(
-        (set) => ({
+        (set, get) => ({
             ...initialState,
 
             resetCurrentTest: () => {
@@ -269,6 +270,14 @@ export const useTestStore = create<TestStore>()(
                 set({ isLoading: true, error: null });
 
                 try {
+                    // Use get() to actually use the current state
+                    const isTieBreaking = get().isTieBreaking;
+
+                    // Verify that tie-breaking is actually in progress
+                    if (!isTieBreaking) {
+                        console.warn("Attempting to save tie-breaker answers when not in tie-breaking mode");
+                    }
+
                     // Mark these answers as tie breakers
                     const tieBreakerAnswers = answers.map(answer => ({
                         ...answer,
@@ -294,6 +303,21 @@ export const useTestStore = create<TestStore>()(
                 }
             },
 
+            saveTestPosition: (testResultId: number, position: number) => {
+                set(state => ({
+                    testPositions: {
+                        ...state.testPositions,
+                        [testResultId]: position
+                    }
+                }));
+            },
+
+            getTestPosition: (testResultId: number): number => {
+                const positions = get().testPositions;
+                return positions[testResultId] || 0;
+            },
+
+            testPositions: initialState.testPositions,
             // Add the timestamp field to the store state
             lastSavedAnswerTimestamp: initialState.lastSavedAnswerTimestamp
         }),
@@ -304,6 +328,7 @@ export const useTestStore = create<TestStore>()(
                 currentTest: state.currentTest,
                 currentTestResult: state.currentTestResult,
                 userTestResults: state.userTestResults,
+                testPositions: state.testPositions,
             }),
         }
     )
@@ -326,3 +351,7 @@ export const useCurrentTestQuestions = () => {
 
 export const useTestLoading = () => useTestStore(state => state.isLoading);
 export const useTestError = () => useTestStore(state => state.error);
+
+export const useTestPosition = (testResultId: number) =>
+    useTestStore(state => state.testPositions[testResultId] || 0);
+

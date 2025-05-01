@@ -46,7 +46,7 @@ export interface TestStore {
     userTestResults: TestResult[];
     isLoading: boolean;
     error: string | null;
-    // New tie-breaking properties
+    // Tie-breaking properties
     tieBreakingQuestions: Question[];
     tiedTypes: { type_id: number; name: string; score: number; }[];
     isTieBreaking: boolean;
@@ -64,7 +64,11 @@ export interface TestStore {
     // New tie-breaking functions
     fetchTieBreakers: (testResultId: number) => Promise<Question[]>;
     saveTieBreakerAnswers: (testResultId: number, answers: Answer[]) => Promise<TestResult | null>;
-    lastSavedAnswerTimestamp: number
+    lastSavedAnswerTimestamp: number;
+    // Test position tracking
+    testPositions: { [testResultId: number]: number };
+    saveTestPosition: (testResultId: number, position: number) => void;
+    getTestPosition: (testResultId: number) => number;
 }
 
 export interface ResultData {
@@ -102,4 +106,10 @@ export interface TestResult {
     result_data?: ResultData;
     progress?: number;
     used_tie_breaker?: boolean;
+}
+
+export interface Props {
+    testResultId: number;
+    setCompleted: (state: boolean) => void;
+    initialAnswers?: {[key: number]: number};
 }

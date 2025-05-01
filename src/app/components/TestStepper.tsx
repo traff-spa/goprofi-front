@@ -1,185 +1,168 @@
-import React, { useState, FC, useEffect, useCallback, useRef } from 'react';
-import '@app/styles/test.scss';
+import { useState, FC, useEffect, useCallback } from 'react';
 import ArrowIcon from '@/assets/icons/arrow-right.svg?react';
+import { useNavigate } from 'react-router-dom';
+
+import '@app/styles/test.scss';
+import { Props, Question } from '@/app/types';
+
+import {
+  calculateProgressPercentage,
+  fetchTestQuestions,
+  fetchTestResult,
+  saveAnswer,
+  completeTest,
+} from '@app/helpers/testHelpers';
+
 import { useTestStore } from '@/store/testStore';
 
-interface Props {
-  testResultId: number;
-  setCompleted: (state: boolean) => void;
-  initialAnswers?: {[key: number]: number};
-}
-
 const TestStepper: FC<Props> = ({ testResultId, setCompleted, initialAnswers = {} }) => {
-  const { saveAnswers, currentTestQuestions, fetchTestResult } = useTestStore();
+  const navigate = useNavigate();
 
-  // Store answers locally
+  // Get position functions from testStore
+  const saveTestPosition = useTestStore(state => state.saveTestPosition);
+  const getTestPosition = useTestStore(state => state.getTestPosition);
+
+  // State management
+  const [currentQuestion, setCurrentQuestion] = useState<Question | null>(null);
+  // Initialize from Zustand store instead of localStorage
+  const [currentStep, setCurrentStep] = useState<number>(() => {
+    return testResultId ? getTestPosition(testResultId) : 0;
+  });
+  const [totalQuestions, setTotalQuestions] = useState(0);
   const [localAnswers, setLocalAnswers] = useState<{[key: number]: number}>(initialAnswers);
-  const [currentStep, setCurrentStep] = useState(0);
-  const [answeredQuestionsCount, setAnsweredQuestionsCount] = useState(Object.keys(initialAnswers).length);
   const [loading, setLoading] = useState(false);
+  const [currentTestQuestions, setCurrentTestQuestions] = useState<Question[]>([]);
 
-  // Use refs to track current state for use in callbacks
-  const stepRef = useRef(currentStep);
-  const questionsRef = useRef(currentTestQuestions);
-  const localAnswersRef = useRef(localAnswers);
+  // Calculate progress percentage
+  const progressPercentage = calculateProgressPercentage(currentStep, totalQuestions);
 
-  // Update refs when values change
+  // Fetch all questions on mount to get total count
   useEffect(() => {
-    stepRef.current = currentStep;
-  }, [currentStep]);
+    const fetchTestData = async () => {
+      try {
+        setLoading(true);
+        if (testResultId) {
+          // Get test result to find the test ID
+          const testResult = await fetchTestResult(testResultId);
 
-  useEffect(() => {
-    questionsRef.current = currentTestQuestions;
-  }, [currentTestQuestions]);
+          if (testResult && testResult.test_id) {
+            // Fetch all questions to get the total count
+            const questions = await fetchTestQuestions(testResult.test_id);
+            setCurrentTestQuestions(questions);
+            setTotalQuestions(questions.length);
 
-  useEffect(() => {
-    localAnswersRef.current = localAnswers;
-  }, [localAnswers]);
+            // Get saved position from Zustand
+            const savedStep = getTestPosition(testResultId);
 
-  // Find the first unanswered question on initial load only
-  useEffect(() => {
-    if (currentTestQuestions.length > 0 && Object.keys(initialAnswers).length > 0) {
-      let foundUnanswered = false;
+            // Ensure saved step is within valid range
+            const validStep = Math.min(savedStep, questions.length - 1);
 
-      for (let i = 0; i < currentTestQuestions.length; i++) {
-        const question = currentTestQuestions[i];
-        if (!initialAnswers[question.id]) {
-          setCurrentStep(i);
-          foundUnanswered = true;
-          break;
+            // Set current step and question based on saved position
+            if (validStep !== currentStep) {
+              setCurrentStep(validStep);
+            }
+
+            // Set the correct question based on the current step
+            if (questions.length > 0) {
+              setCurrentQuestion(questions[validStep]);
+            }
+          }
         }
+      } catch (error) {
+        console.error('Error fetching test data:', error);
+      } finally {
+        setLoading(false);
       }
+    };
 
-      // If all questions are answered, position at the last question
-      if (!foundUnanswered) {
-        setCurrentStep(currentTestQuestions.length - 1);
-      }
-    }
-  }, [currentTestQuestions.length, initialAnswers]); // Include initialAnswers in dependency array
+    fetchTestData();
+  }, [testResultId, currentStep, getTestPosition]);
 
-  // Sync progress with answer count when needed
-  useEffect(() => {
-    const totalAnswered = Object.keys(localAnswers).length;
-    if (totalAnswered !== answeredQuestionsCount) {
-      setAnsweredQuestionsCount(totalAnswered);
-    }
-  }, [localAnswers, answeredQuestionsCount]);
-
-  // Option selection handler
+  // Handle option selection
   const handleOptionSelect = useCallback((questionId: number, optionId: number) => {
-    if (loading) return;
+    setLocalAnswers(prev => ({
+      ...prev,
+      [questionId]: optionId
+    }));
+  }, []);
 
-    setLocalAnswers(prev => {
-      const updated = { ...prev, [questionId]: optionId };
-      // Save to localStorage in a single operation
-      localStorage.setItem(`test_${testResultId}_answers`, JSON.stringify(updated));
-      return updated;
-    });
-
-    // Track number of answered questions more efficiently
-    const wasAlreadyAnswered = initialAnswers[questionId] !== undefined ||
-        Object.prototype.hasOwnProperty.call(localAnswersRef.current, questionId);
-
-    if (!wasAlreadyAnswered) {
-      setAnsweredQuestionsCount(prev => prev + 1);
+  // Save current step to Zustand whenever it changes
+  useEffect(() => {
+    if (testResultId && currentStep >= 0) {
+      saveTestPosition(testResultId, currentStep);
     }
-  }, [loading, initialAnswers, testResultId]);
+  }, [currentStep, testResultId, saveTestPosition]);
 
-  const handleNext = useCallback(async (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault();
-    e.stopPropagation();
-
-    if (loading) return;
-    setLoading(true);
+  // Handle next button click
+  const handleNext = useCallback(async () => {
+    if (!currentQuestion) return;
 
     try {
-      // Use ref values to avoid closure issues
-      const currentStepValue = stepRef.current;
-      const questions = questionsRef.current;
-      const answers = localAnswersRef.current;
+      setLoading(true);
 
-      if (!questions.length) {
-        setLoading(false);
-        return;
-      }
+      // Save the current answer
+      await saveAnswer(testResultId, currentQuestion.id, localAnswers[currentQuestion.id]);
 
-      const currentQuestion = questions[currentStepValue];
-      if (!currentQuestion) {
-        setLoading(false);
-        return;
-      }
+      if (currentStep === totalQuestions - 1) {
+        // Complete the test
+        await completeTest(testResultId);
 
-      const selectedOptionId = answers[currentQuestion.id];
-      if (!selectedOptionId) {
-        setLoading(false);
-        return;
-      }
-
-      // Prepare the answer to save
-      const answersToSave = [{
-        question_id: currentQuestion.id,
-        selected_option_id: selectedOptionId
-      }];
-
-      // Check if this is the last question
-      const isLastQuestion = currentStepValue >= questions.length - 1;
-
-      // First save the answer
-      const saveResponse = await saveAnswers(testResultId, answersToSave);
-
-      if (!saveResponse) {
-        throw new Error('Failed to save answer');
-      }
-
-      // Update test result to ensure store is synced
-      await fetchTestResult(testResultId);
-
-      // Important: Only update after server operations are complete
-      if (!isLastQuestion) {
-        // Move to the next question
-        setCurrentStep(prev => prev + 1);
-      } else {
-        // We've reached the end
         setCompleted(true);
+
+        // Navigate to the results page with the test result ID
+        navigate(`/results/${testResultId}`);
+        return;
+      }
+
+      // Move to the next question
+      const nextStep = currentStep + 1;
+      setCurrentStep(nextStep);
+
+      // Save progress to Zustand
+      saveTestPosition(testResultId, nextStep);
+
+      // Get the next question from our already loaded questions
+      if (currentTestQuestions[nextStep]) {
+        setCurrentQuestion(currentTestQuestions[nextStep]);
       }
     } catch (error) {
-      console.error("Error in handleNext:", error);
-      alert('Failed to save your answer. Please try again.');
+      console.error('Error saving answer or fetching next question:', error);
     } finally {
       setLoading(false);
     }
-  }, [saveAnswers, fetchTestResult, testResultId, setCompleted, loading]);
+  }, [currentQuestion, currentStep, localAnswers, testResultId, totalQuestions, currentTestQuestions, navigate, saveTestPosition]);
 
-  // Handle back button
-  const handleBack = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault();
-    if (stepRef.current > 0 && !loading) {
-      setCurrentStep(prev => prev - 1);
+  // Handle back button click
+  const handleBack = useCallback(() => {
+    if (currentStep > 0) {
+      const prevStep = currentStep - 1;
+      setCurrentStep(prevStep);
+
+      // Save progress to Zustand
+      saveTestPosition(testResultId, prevStep);
+
+      setCurrentQuestion(currentTestQuestions[prevStep]);
     }
-  }, [loading]);
+  }, [currentStep, currentTestQuestions, testResultId, saveTestPosition]);
 
-  // Loading state
-  if (currentTestQuestions.length === 0) {
-    return <div>Loading questions...</div>;
-  }
-
-  // Get current question
-  const currentQuestion = currentTestQuestions[currentStep];
-  if (!currentQuestion) {
-    return <div>No questions available</div>;
-  }
-
-  // Calculate button states and progress
+  // UI states
   const isFirstStep = currentStep === 0;
-  const isLastStep = currentStep === currentTestQuestions.length - 1;
-  const isOptionSelected = !!localAnswers[currentQuestion.id];
-  const progressPercentage = Math.round((answeredQuestionsCount / currentTestQuestions.length) * 100);
+  const isLastStep = currentStep === totalQuestions - 1;
+  const isOptionSelected = currentQuestion ? !!localAnswers[currentQuestion.id] : false;
 
+  const cursorStyle = { cursor: loading ? 'wait' : 'pointer' };
+
+  if (!currentQuestion) {
+    return <div className="test-section">Loading...</div>;
+  }
+
+  // Rest of the component remains the same
   return (
       <div className="test-section">
+        {/* Component UI, no changes needed here */}
         <div className="test-section__body">
           <div className="test-section__title">
-            Питання {currentStep + 1} з {currentTestQuestions.length}
+            Питання {currentStep + 1} з {totalQuestions}
           </div>
           <div className="test-section__progress">
             <div
@@ -201,24 +184,23 @@ const TestStepper: FC<Props> = ({ testResultId, setCompleted, initialAnswers = {
                           handleOptionSelect(currentQuestion.id, option.id);
                         }
                       }}
-                      style={{ cursor: loading ? 'wait' : 'pointer' }}
+                      style={cursorStyle}
                   >
-                    <div className="radio-wrapper" style={{ display: 'block', width: '100%' }}>
+                    <div className="radio-wrapper">
                       <input
                           type="radio"
                           id={`option-${option.id}`}
                           name={`question-${currentQuestion.id}`}
                           value={option.id.toString()}
                           checked={localAnswers[currentQuestion.id] === option.id}
-                          onChange={() => {}} // Required by React but we handle via onClick
-                          style={{ position: 'absolute', opacity: 0 }}
+                          onChange={()=>{}}
                       />
                       <span
                           className={localAnswers[currentQuestion.id] === option.id ? 'selected' : ''}
-                          style={{ cursor: loading ? 'wait' : 'pointer' }}
+                          style={cursorStyle}
                       >
-                        {option.text}
-                      </span>
+                      {option.text}
+                    </span>
                     </div>
                   </div>
               ))}

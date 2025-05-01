@@ -24,14 +24,12 @@ export const testService = {
             method: 'GET',
         }),
 
-    // New method to get a single question by ID
     getQuestionById: (id: number) =>
         request<Question>({
             url: `/questions/${id}`,
             method: 'GET',
         }),
 
-    // Original method - keep for compatibility
     getTestQuestions: (testId: number) => {
         return request<TestQuestionsResponse>({
             url: `/tests/${testId}/questions`,
@@ -40,7 +38,6 @@ export const testService = {
     },
 
     startTest: (userId: number, testId: number) => {
-        console.log(`Starting test for user ${userId}, test ID: ${testId}`);
         return request<TestResult>({
             url: '/test-results',
             method: 'POST',
@@ -56,8 +53,6 @@ export const testService = {
             console.warn('No answers to save');
             return { message: 'No answers to save', test_result_id: testResultId };
         }
-
-        console.log(`Saving ${answers.length} answers to the server for test ${testResultId}`);
 
         try {
             return await request<SaveAnswersResponse>({
@@ -78,7 +73,6 @@ export const testService = {
         }),
 
     getTestResult: (id: number) => {
-        console.log(`Fetching test result for ID: ${id}`);
         return request<TestResult>({
             url: `/test-results/${id}`,
             method: 'GET',
@@ -106,34 +100,5 @@ export const testService = {
             method: 'POST',
             data: { answers },
         });
-    },
-
-    // Efficient batched saving of multiple answers
-    saveMultipleAnswers: async (testResultId: number, answers: Answer[]) => {
-        if (!answers || answers.length === 0) {
-            return { message: 'No answers to save', test_result_id: testResultId };
-        }
-
-        // Batch answers in groups of 10 for better performance
-        const batches = [];
-        for (let i = 0; i < answers.length; i += 10) {
-            batches.push(answers.slice(i, i + 10));
-        }
-
-        // Process batches sequentially
-        for (const batch of batches) {
-            try {
-                await request<SaveAnswersResponse>({
-                    url: `/test-results/${testResultId}/answers`,
-                    method: 'POST',
-                    data: { answers: batch },
-                });
-            } catch (error) {
-                console.error('Error saving answer batch:', error);
-                throw error;
-            }
-        }
-
-        return { message: 'All answers saved successfully', test_result_id: testResultId };
     }
 };

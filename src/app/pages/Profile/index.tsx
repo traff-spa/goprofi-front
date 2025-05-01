@@ -6,7 +6,6 @@ import { authService } from '@/app/api/services';
 import '@/app/styles/profile.scss';
 
 const Profile = () => {
-  const [loading, setLoading] = useState(false);
   const [googleModalVisible, setGoogleModalVisible] = useState(false);
   const { user, setUser } = useAuthStore();
 
@@ -14,48 +13,38 @@ const Profile = () => {
     // Refresh user data when the profile page loads
     const fetchCurrentUser = async () => {
       try {
-        setLoading(true);
         const { user: currentUser } = await authService.getCurrentUser();
         setUser(currentUser);
       } catch (error) {
         console.error('Failed to fetch current user:', error);
         message.error('Не вдалося завантажити дані профілю');
-      } finally {
-        setLoading(false);
       }
     };
 
     fetchCurrentUser();
   }, [setUser]);
 
-  // Check for Google connection success parameter
-  // In your Profile component
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const connectSuccess = params.get('connect_success');
     const token = params.get('token');
 
     if (connectSuccess === 'true' || token) {
-      console.log('Google connection detected');
       // If we got a new token, use it
       if (token) {
         localStorage.setItem('auth_token', token);
       }
 
       // Force refresh user data to get updated Google status
-      setLoading(true);
       authService.getCurrentUser()
           .then(response => {
-            console.log('Updated user data after Google connection:', response.user);
             setUser(response.user);
             message.success('Google акаунт успішно підключено!');
           })
           .catch(error => {
-            console.error('Failed to get updated user data:', error);
-            message.error('Не вдалося оновити дані профілю');
+            message.error('Не вдалося оновити дані профілю', error);
           })
           .finally(() => {
-            setLoading(false);
             // Clean up URL parameters
             window.history.replaceState({}, document.title, window.location.pathname);
           });
@@ -80,16 +69,6 @@ const Profile = () => {
     authService.connectGoogleAccount();
     hideGoogleModal();
   };
-
-  if (loading) {
-    return (
-        <div className="profile">
-          <div className="profile__inner" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '400px' }}>
-            <div>Завантаження...</div>
-          </div>
-        </div>
-    );
-  }
 
   if (!user) {
     return (

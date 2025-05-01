@@ -9,6 +9,22 @@ export interface User {
     roles?: string[];
 }
 
+interface IUser {
+    id: string;
+    email: string;
+    name?: string;
+    firstName?: string;
+    lastName?: string;
+    roles?: string[];
+}
+
+export interface UserState {
+    user: IUser | null;
+    isAuthenticated: boolean;
+    setUser: (user: IUser) => void;
+    clearUser: () => void;
+}
+
 export interface LoginRequest {
     email: string;
     password: string;
@@ -42,4 +58,17 @@ export interface AuthState {
     loginWithGoogle: () => void;
     handleGoogleCallback: (token: string) => Promise<void>;
     clearError: () => void;
+}
+
+export type FieldLoginType = {
+    email: string;
+    password: string;
+}
+
+export type FieldRegistrationType = {
+    email: string;
+    password: string;
+    confirmPassword: string;
+    firstName?: string;
+    lastName?: string;
 }
