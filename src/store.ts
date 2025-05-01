@@ -1,19 +1,10 @@
 import { create } from 'zustand';
 
-interface IUser {
-  id: string;
-  email: string;
-  name: string | null;
-}
-
-interface UserState {
-  user: IUser | null;
-  setUser: (user: IUser) => void;
-  clearUser: () => void;
-}
+import {UserState} from "@app/types";
 
 export const useUserStore = create<UserState>((set) => ({
   user: null,
-  setUser: (user) => set({ user }),
-  clearUser: () => set({ user: null }),
+  isAuthenticated: false,
+  setUser: (user) => set({ user, isAuthenticated: true }),
+  clearUser: () => set({ user: null, isAuthenticated: false }),
 }));

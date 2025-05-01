@@ -1,18 +1,20 @@
 import { Navigate } from 'react-router-dom';
+import { useAuthStore } from '@/store/authStore';
 import { ROUTES } from './paths';
-import { useUserStore } from '@/store';
+import React from "react";
 
-interface Props {
+interface PublicRouteProps {
   children: React.ReactNode;
 }
 
-export const PublicRoute = ({ children }: Props) => {
-  const { user } = useUserStore()
-  const isAuthenticated = user && user?.id;
+export const PublicRoute = ({ children }: PublicRouteProps) => {
+  const { isAuthenticated } = useAuthStore();
 
   if (isAuthenticated) {
     return <Navigate to={ROUTES.MAIN} replace />;
   }
 
-  return children;
-}
+  return <>{children}</>;
+};
+
+export default PublicRoute;

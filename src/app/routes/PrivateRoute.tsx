@@ -1,20 +1,29 @@
-import { Navigate } from 'react-router-dom';
+// src/app/routes/PrivateRoute.tsx
+import { Navigate, useLocation } from 'react-router-dom';
+import { useAuthStore } from '@/store/authStore';
 import { ROUTES } from './paths';
-import { useUserStore } from '@/store';
+import React from "react";
 
-interface Props {
+interface PrivateRouteProps {
   children: React.ReactNode;
+  adminOnly?: boolean;
 }
 
-export const PrivateRoute = ({ children }: Props) => {
-  // const isAuthenticated = useAuth(); // TODO
-  const { user } = useUserStore()
-  // const isAuthenticated = user && user?.id;
-  const isAuthenticated = true;
+export const PrivateRoute = ({ children, adminOnly = false }: PrivateRouteProps) => {
+  const { user, isAuthenticated } = useAuthStore();
+  const location = useLocation();
 
   if (!isAuthenticated) {
-    return <Navigate to={ROUTES.AUTH} replace />;
+    // Redirect to login page with return url
+    return <Navigate to={ROUTES.AUTH} state={{ from: location }} replace />;
   }
 
-  return children;
-}
+  if (adminOnly && !user?.roles?.includes('admin')) {
+    // Redirect unauthorized users
+    return <Navigate to={ROUTES.MAIN} replace />;
+  }
+
+  return <>{children}</>;
+};
+
+export default PrivateRoute;
