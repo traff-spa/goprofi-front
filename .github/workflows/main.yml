@@ -20,6 +20,6 @@ jobs:
     - name: connect and pull
       run: ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd ${{ secrets.WORK_DIR }} && git checkout ${{ secrets.MAIN_BRANCH }} && git reset --hard HEAD && git pull && exit"
     - name: npm i & migrate & restart pm2
-      run: ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd ${{ secrets.WORK_DIR }} && npm i --force && npm run migrate && pm2 restart back && exit"
+      run: ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd ${{ secrets.WORK_DIR }} && npm i --force && pm2 restart front && exit"
     - name: cleanup
       run: rm -rf ~/.ssh
