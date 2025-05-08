@@ -46,7 +46,6 @@ const Auth = () => {
   const onLogin: FormProps<FieldLoginType>['onFinish'] = async (values) => {
     setIsLoading(true);
     try {
-      console.log('Submitting login form with:', values);
       await login(String(values.email).toLowerCase(), values.password);
       message.success('Login successful!');
       navigate(ROUTES.MAIN);

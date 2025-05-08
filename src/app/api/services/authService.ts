@@ -34,7 +34,7 @@ export const authService = {
         }),
 
     loginWithGoogle: () => {
-        const googleAuthUrl = `${import.meta.env.VITE_API_URL || 'http://localhost:3000/api'}/auth/google`;
+        const googleAuthUrl = `${import.meta.env.VITE_API_URL}/auth/google`;
         window.location.href = googleAuthUrl;
     },
 
@@ -47,7 +47,7 @@ export const authService = {
         }
 
         // Include the token directly in the URL for the backend to identify the user
-        window.location.href = `${import.meta.env.VITE_API_URL || 'http://localhost:3000/api'}/auth/google?connect=true&auth_token=${encodeURIComponent(token)}`;
+        window.location.href = `${import.meta.env.VITE_API_URL}/auth/google?connect=true&auth_token=${encodeURIComponent(token)}`;
     },
 
     // Handling token received from OAuth flow (works for both login and connection)
