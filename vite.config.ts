@@ -11,7 +11,9 @@ export default defineConfig({
     nodePolyfills()
   ],
   server: {
-    port: 3001
+    allowedHosts: ['goprofi.ai'],
+    port: 3001,
+    host: true
   },
   resolve: {
     alias: {
