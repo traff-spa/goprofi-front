@@ -31,17 +31,19 @@ const TestResult: React.FC = () => {
 
     if (error || !currentTestResult || !currentTestResult.completed_at) {
         return (
-            <div className="test-container">
-                <div>
-                    <h2>Помилка завантаження результатів</h2>
-                    <p>{error || 'Результат тесту не знайдено або тест не завершено.'}</p>
-                    <button
-                        onClick={() => navigate(ROUTES.MAIN)}
-                        className="test-results-btn"
-                        type="button"
-                    >
-                        Повернутися на головну
-                    </button>
+            <div className="test-result">
+                <div className="test-container">
+                    <div>
+                        <h2>Помилка завантаження результатів</h2>
+                        <p>{error || 'Результат тесту не знайдено або тест не завершено.'}</p>
+                        <button
+                            onClick={() => navigate(ROUTES.MAIN)}
+                            className="test-results-btn"
+                            type="button"
+                        >
+                            Повернутися на головну
+                        </button>
+                    </div>
                 </div>
             </div>
         );
@@ -68,7 +70,7 @@ const TestResult: React.FC = () => {
                     </div>
 
                     <div className="test-result__description">
-                        Ви {typeDetails.typeNumber} тип еннеаграми, {typeDetails.typeDescription}.
+                        <span>Ви {typeDetails.typeNumber} тип еннеаграми</span>, {typeDetails.typeDescription}.
                     </div>
 
                     <div className="test-result__content">

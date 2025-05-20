@@ -132,7 +132,7 @@ button:focus-visible {
     font-weight: 500;
     font-size: 15px;
     line-height: 140%;
-    color: var(--korichnevyy);
+    color: var(--korichnevyy) !important;
     height: auto !important;
     margin-bottom: 5px;
     &::before,
@@ -149,14 +149,28 @@ button:focus-visible {
   height: 50px;
   font-weight: 500 !important;
   font-size: 16px !important;
+  border: none !important;
+  &:focus {
+    box-shadow: 0 0 6px 0 rgba(0, 0, 0, 0.05);
+  }
+  &:active {
+    box-shadow: 0 0 6px 0 rgba(0, 0, 0, 0.05);
+  }
   &::placeholder {
     color: var(--korichnevyy) !important;
   }
 }
 
 .ant-input-password {
+  border: none !important;
   border-radius: 10px !important;
   height: 50px;
+  &:focus {
+    box-shadow: 0 0 6px 0 rgba(0, 0, 0, 0.05) !important;
+  }
+  &:active {
+    box-shadow: 0 0 6px 0 rgba(0, 0, 0, 0.05) !important;
+  }
   .ant-input {
     height: auto;
   }
@@ -165,6 +179,10 @@ button:focus-visible {
     svg {
       fill: #4C4B4A;
     }
+  }
+  &:where(.css-dev-only-do-not-override-1yacf91).ant-input-outlined:focus,
+  &:where(.css-dev-only-do-not-override-1yacf91).ant-input-outlined:focus-within {
+    box-shadow: 0 0 6px 0 rgba(0, 0, 0, 0.05) !important;
   }
 }
 

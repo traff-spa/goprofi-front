@@ -54,6 +54,8 @@
     width: 100%;
     flex-basis: 424px;
     min-height: 640px;
+    background-size: cover;
+    background-position: top left;
     img {
       height: 100%;
     }
@@ -64,6 +66,7 @@
     max-width: 510px;
     width: 100%;
     flex-basis: 510px;
+    position: relative;
     padding: 40px 60px 40px 50px;
     @include mixins.response(991px) {
       padding: 40px 30px;
@@ -71,6 +74,7 @@
     @include mixins.response(767px) {
       padding: 0 30px;
       flex-basis: auto;
+      margin-top: 35px;
     }
     @include mixins.response(580px) {
       padding: 0;
@@ -129,6 +133,27 @@
       @include mixins.hover() {
         color: var(--blue);
       }
+    }
+  }
+  &__close {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    cursor: pointer;
+    svg {
+      path {
+        transition: .3s ease-in-out;
+      }
+    }
+    &:hover {
+      svg {
+        path {
+          stroke: #000;
+        }
+      }
+    }
+    @include mixins.response(767px) {
+      display: none;
     }
   }
 }

@@ -138,12 +138,12 @@
     font-weight: 500;
     font-size: 16px;
     line-height: 160%;
-    color: #930000;
+    color: var(--black);
     cursor: pointer;
     transition: .3s ease-in-out;
     margin-bottom: 18px;
     svg {
-      fill: #930000;
+      fill: var(--black);
       transition: .3s ease-in-out;
     }
     &:hover {
@@ -154,13 +154,24 @@
     }
   }
   &__logout {
+    color: #930000;
     margin: 100px 0 0;
+    svg {
+      fill: #930000;
+    }
+    &:hover {
+      color: #630303 !important;
+      svg {
+        fill: #630303;
+      }
+    }
   }
 }
 
 .ant-dropdown {
   min-width: 320px !important;
   border: 1px solid #eee;
+  border-radius: 21px;
   .ant-dropdown-menu {
     padding: 24px 20px !important;
     border-radius: 20px !important;

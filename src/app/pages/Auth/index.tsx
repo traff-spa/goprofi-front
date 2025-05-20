@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Input, Form, Button, message } from 'antd';
 import type { FormProps } from 'antd';
+import { Link } from 'react-router-dom';
 import useGetViewport from '@app/hooks/useGetViewport';
 import { useAuthStore } from '@/store/authStore';
 import { ROUTES } from '@/app/routes/paths';
@@ -93,11 +94,17 @@ const Auth = () => {
       <div className="auth">
         <div className="auth__inner">
           {viewportWidth > 767 && (
-              <div className="auth__left">
-                <img src="/images/auth-section-img-2x.png" width="424" height="640" alt="" />
-              </div>
+              <div className="auth__left" style={{ backgroundImage: 'url(/images/auth-section-img-2x.png)' }} />
           )}
           <div className="auth__right">
+            <div className="auth__close">
+              <Link to={ROUTES.MAIN}>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M18 6L6 18" stroke="#4C4B4A" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  <path d="M6 6L18 18" stroke="#4C4B4A" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              </Link>
+            </div>
             {isLoginMode ? (
                 <>
                   <Form
@@ -140,7 +147,7 @@ const Auth = () => {
                       onClick={handleGoogleLogin}
                       style={{ cursor: 'pointer', opacity: isLoading ? 0.7 : 1 }}
                   >
-                    <img src="/images/google-icon.png" width="24" height="24" alt="google logo" />
+                    <img src="/images/google-icon.svg" width="24" height="24" alt="google logo" />
                     Продовжити за допомогою Google
                   </div>
                 </>
@@ -224,7 +231,7 @@ const Auth = () => {
                       onClick={handleGoogleLogin}
                       style={{ cursor: 'pointer', opacity: isLoading ? 0.7 : 1 }}
                   >
-                    <img src="/images/google-icon.png" width="24" height="24" alt="google logo" />
+                    <img src="/images/google-icon.svg" width="24" height="24" alt="google logo" />
                     Зареєструватися за допомогою Google
                   </div>
                 </>
