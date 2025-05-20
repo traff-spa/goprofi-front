@@ -70,7 +70,7 @@ const Auth = () => {
       navigate(ROUTES.MAIN);
     } catch (error: any) {
       console.error('Registration error:', error);
-      message.error(error.message || 'Registration failed. Please try again.');
+      message.error(error?.message || error?.[0]?.msg || 'Registration failed. Please try again.');
     } finally {
       setIsLoading(false);
     }
@@ -94,7 +94,7 @@ const Auth = () => {
         <div className="auth__inner">
           {viewportWidth > 767 && (
               <div className="auth__left">
-                <img src="/images/auth-section-img.png" width="424" height="640" alt="" />
+                <img src="/images/auth-section-img-2x.png" width="424" height="640" alt="" />
               </div>
           )}
           <div className="auth__right">
