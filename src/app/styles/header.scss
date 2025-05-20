@@ -138,12 +138,12 @@
     font-weight: 500;
     font-size: 16px;
     line-height: 160%;
-    color: var(--black);
+    color: #930000;
     cursor: pointer;
     transition: .3s ease-in-out;
     margin-bottom: 18px;
     svg {
-      fill: var(--black);
+      fill: #930000;
       transition: .3s ease-in-out;
     }
     &:hover {
@@ -155,12 +155,6 @@
   }
   &__logout {
     margin: 100px 0 0;
-    &:hover {
-      color: #930000 !important;
-      svg {
-        fill: #930000;
-      }
-    }
   }
 }
 
