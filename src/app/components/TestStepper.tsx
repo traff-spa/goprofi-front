@@ -18,6 +18,10 @@ import { useTestStore } from '@/store/testStore';
 const TestStepper: FC<Props> = ({ testResultId, setCompleted, initialAnswers = {} }) => {
   const navigate = useNavigate();
 
+  // Get the setIsTestPage and setTestTitle functions
+  const setIsTestPage = useTestStore(state => state.setIsTestPage);
+  const setTestTitle = useTestStore(state => state.setTestTitle);
+
   // Get position functions from testStore
   const saveTestPosition = useTestStore(state => state.saveTestPosition);
   const getTestPosition = useTestStore(state => state.getTestPosition);
@@ -35,6 +39,18 @@ const TestStepper: FC<Props> = ({ testResultId, setCompleted, initialAnswers = {
 
   // Calculate progress percentage
   const progressPercentage = calculateProgressPercentage(currentStep, totalQuestions);
+
+// Set the test page flag and title on the mount
+  useEffect(() => {
+    setIsTestPage(true);
+    setTestTitle('Тест "Хто я"');
+
+    // Clean up when a component unmounts
+    return () => {
+      setIsTestPage(false);
+      setTestTitle(null);
+    };
+  }, []);
 
   // Fetch all questions on mount to get total count
   useEffect(() => {
@@ -86,7 +102,7 @@ const TestStepper: FC<Props> = ({ testResultId, setCompleted, initialAnswers = {
     }));
   }, []);
 
-  // Save current step to Zustand whenever it changes
+  // Save the current step to Zustand whenever it changes
   useEffect(() => {
     if (testResultId && currentStep >= 0) {
       saveTestPosition(testResultId, currentStep);
@@ -109,7 +125,7 @@ const TestStepper: FC<Props> = ({ testResultId, setCompleted, initialAnswers = {
 
         setCompleted(true);
 
-        // Navigate to the results page with the test result ID
+        // Navigate to the result page with the test result ID
         navigate(`/results/${testResultId}`);
         return;
       }
@@ -156,7 +172,7 @@ const TestStepper: FC<Props> = ({ testResultId, setCompleted, initialAnswers = {
     return <div className="test-section">Loading...</div>;
   }
 
-  // Rest of the component remains the same
+  // The rest of the component remains the same
   return (
       <div className="test-section">
         {/* Component UI, no changes needed here */}

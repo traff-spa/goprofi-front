@@ -20,6 +20,9 @@ const initialState = {
     userTestResults: [],
     isLoading: false,
     error: null,
+    // testStepper props
+    isTestPage: false,
+    testTitle: null,
     // Tie-breaking properties
     tieBreakingQuestions: [],
     tiedTypes: [],
@@ -43,6 +46,9 @@ export const useTestStore = create<TestStore>()(
                     lastSavedAnswerTimestamp: 0,
                 });
             },
+
+            setIsTestPage: (isTestPage: boolean) => set({ isTestPage }),
+            setTestTitle: (testTitle: string | null) => set({ testTitle }),
 
             startTest: async (userId: number, testId: number): Promise<TestResult | null> => {
                 set({ isLoading: true, error: null });
@@ -352,6 +358,6 @@ export const useCurrentTestQuestions = () => {
 export const useTestLoading = () => useTestStore(state => state.isLoading);
 export const useTestError = () => useTestStore(state => state.error);
 
-export const useTestPosition = (testResultId: number) =>
-    useTestStore(state => state.testPositions[testResultId] || 0);
+// export const useTestPosition = (testResultId: number) =>
+//     useTestStore(state => state.testPositions[testResultId] || 0);
 

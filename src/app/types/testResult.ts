@@ -51,7 +51,13 @@ export interface TestStore {
     tiedTypes: { type_id: number; name: string; score: number; }[];
     isTieBreaking: boolean;
 
+    // testPage props
+    isTestPage: boolean;
+    testTitle: string | null;
+
     // Actions
+    setIsTestPage: (isTestPage: boolean) => void;
+    setTestTitle: (title: string | null) => void;
     resetCurrentTest: () => void;
     fetchAllTests: () => Promise<Test[]>;
     fetchTestById: (id: number) => Promise<Test | null>;
@@ -61,7 +67,7 @@ export interface TestStore {
     startTest: (userId: number, testId: number) => Promise<TestResult | null>;
     saveAnswers: (testResultId: number, answers: Answer[]) => Promise<any>;
     completeTest: (testResultId: number) => Promise<TestResult | null>;
-    // New tie-breaking functions
+    // New tiebreaking functions
     fetchTieBreakers: (testResultId: number) => Promise<Question[]>;
     saveTieBreakerAnswers: (testResultId: number, answers: Answer[]) => Promise<TestResult | null>;
     lastSavedAnswerTimestamp: number;
