@@ -10,6 +10,7 @@ import MenuHistoryIcon from '@/assets/icons/menu-history.svg?react';
 import MenuProfileIcon from '@/assets/icons/menu-profile.svg?react';
 import MenuLogoutIcon from '@/assets/icons/menu-logout.svg?react';
 import { useAuthStore } from '@/store/authStore';
+import { useTestStore } from "@/store/testStore";
 
 export const Header = () => {
     const location = useLocation();
@@ -17,6 +18,10 @@ export const Header = () => {
 
     const navigate = useNavigate();
     const { user, logout, isAuthenticated } = useAuthStore();
+
+    // Use separate selectors for each state value to avoid infinite loop
+    const isTestPage = useTestStore(state => state.isTestPage);
+    const testTitle = useTestStore(state => state.testTitle);
 
     const onLogout = () => {
         logout();
@@ -75,13 +80,19 @@ export const Header = () => {
     return (
         <header className="header">
             <div className="header__inner">
-                <div className="logo">
-                    {!isMainPage ? (
-                        <Link to={ROUTES.MAIN}>
+                <div className="logo-wrapper">
+                    <div className="logo">
+                        {!isMainPage ? (
+                            <Link to={ROUTES.MAIN}>
+                                <img src={logo} className="logo" alt="logo" />
+                            </Link>
+                        ) : (
                             <img src={logo} className="logo" alt="logo" />
-                        </Link>
-                    ) : (
-                        <img src={logo} className="logo" alt="logo" />
+                        )}
+                    </div>
+
+                    {isTestPage && testTitle && (
+                        <div className="test-title">{testTitle}</div>
                     )}
                 </div>
                 {isAuthenticated ? (
@@ -97,12 +108,10 @@ export const Header = () => {
                         className="login-btn"
                     >
                         <LoginIcon width={20} height={20} />
-                        Увiйти
+                        Увійти
                     </Link>
                 )}
             </div>
         </header>
     );
 };
-
-export default Header;

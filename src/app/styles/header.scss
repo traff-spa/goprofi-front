@@ -183,3 +183,22 @@
     }
   }
 }
+
+.logo-wrapper {
+  display: flex;
+  align-items: stretch;
+  gap: 75px;
+}
+
+@font-face {
+  font-family: 'Book Antiqua';
+  src: url('../../assets/fonts/BookAntiquaBold.ttf') format('truetype');
+  font-weight: 700;
+}
+
+.test-title {
+  font-family: 'Book Antiqua', serif;
+  font-size: 28px;
+  color: #141414;
+  line-height: 140%;
+}
