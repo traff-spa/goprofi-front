@@ -103,6 +103,7 @@ const Auth = () => {
                   <Form
                       name="login"
                       autoComplete="off"
+                      scrollToFirstError={{ behavior: 'instant', block: 'end', focus: true }}
                       onFinish={onLogin}
                   >
                     <div className="auth__title">Увiйти</div>
@@ -165,12 +166,22 @@ const Auth = () => {
                     <Form.Item<FieldRegistrationType>
                         label="Ім'я"
                         name="firstName"
+                        rules={[
+                          { required: true, message: "Введіть, будь ласка, ім'я" },
+                          { min: 3, message: "Введіть, будь ласка, ім'я, мінімум 3 літери" },
+                          { type: "string", message: "Введіть, будь ласка, коректне ім'я" }
+                        ]}
                     >
                       <Input autoComplete="off" placeholder="Введіть ім'я" />
                     </Form.Item>
                     <Form.Item<FieldRegistrationType>
                         label="Прізвище"
                         name="lastName"
+                        rules={[
+                          { required: true, message: "Введіть, будь ласка, прізвище" },
+                          { min: 3, message: "Введіть, будь ласка, прізвище, мінімум 3 літери" },
+                          { type: "string", message: "Введіть коректне прізвище" }
+                        ]}
                     >
                       <Input autoComplete="off" placeholder="Введіть прізвище" />
                     </Form.Item>
