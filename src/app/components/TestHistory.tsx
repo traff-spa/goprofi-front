@@ -21,6 +21,43 @@ import '@app/styles/history.scss';
 export const TestHistory: React.FC = () => {
     const navigate = useNavigate();
     const { user } = useAuthStore();
+
+    const { startTest } = useTestStore();
+
+    const handleStartTest = async (e: React.MouseEvent<HTMLButtonElement>) => {
+        e.preventDefault();
+
+        if (!user?.id) {
+            navigate(ROUTES.AUTH);
+            return;
+        }
+
+        try {
+            // Convert user.id to number regardless of its original type
+            const userId = parseInt(user.id.toString(), 10);
+
+            if (isNaN(userId)) {
+                throw new Error(`Invalid user ID: ${user.id}`);
+            }
+
+            console.log('Starting test for user:', user.id, 'converted to:', userId);
+
+            // Default test ID
+            const testId = 1;
+
+            // Start the test
+            const testResult = await startTest(userId, testId);
+
+            if (testResult) {
+                navigate(`/test/${testResult.id}`);
+            } else {
+                alert('Unable to start the test. Please try again later.');
+            }
+        } catch (error) {
+            alert('Unable to start the test. Please try again later.');
+        }
+    };
+
     const {
         userTestResults,
         fetchUserTestResults,
@@ -29,8 +66,8 @@ export const TestHistory: React.FC = () => {
 
     useEffect(() => {
         if (!user || !user.id) {
-            console.log('No user found, redirecting to auth page');
             navigate(ROUTES.AUTH);
+            console.log('No user found, redirecting to auth page');
             return;
         }
 
@@ -45,7 +82,7 @@ export const TestHistory: React.FC = () => {
         };
 
         loadTestResults();
-    }, [user, navigate, fetchUserTestResults]);
+    }, [user]);
 
     if (isLoading) {
         return (
@@ -66,6 +103,15 @@ export const TestHistory: React.FC = () => {
                 <div className="test-history__head">
                     <div className="test-history__title">Історія тестів</div>
                 </div>
+
+                <button
+                    onClick={handleStartTest}
+                    className="main-section__button"
+                    type="button"
+                >
+                    Пройти тест
+                    <span><ArrowIcon width={17} height={12} /></span>
+                </button>
 
                 {hasNoTestResults(userTestResults) ? (
                     <div>У вас ще немає пройдених тестів.</div>
