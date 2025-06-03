@@ -48,7 +48,7 @@ const TestStepper: FC<Props> = ({ testResultId, setCompleted, initialAnswers = {
     // Clean up when a component unmounts
     return () => {
       setIsTestPage(false);
-      setTestTitle(null);
+      setTestTitle('');
     };
   }, []);
 

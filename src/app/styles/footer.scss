@@ -1,5 +1,49 @@
 @use './mixins.scss';
 
+.main-section__button {
+  margin: 36px 0;
+  border-radius: 60px;
+  padding: 0 10px 0 28px;
+  width: 330px;
+  height: 64px;
+  background: #006654;
+  display: flex;
+  align-items: center;
+  font-weight: 500;
+  font-size: 20px;
+  line-height: 140%;
+  text-align: center;
+  color: var(--white);
+  cursor: pointer;
+  transition: .3s ease-in-out;
+
+  span {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #338576;
+    border-radius: 50%;
+    margin-left: auto;
+    flex-shrink: 0;
+    transition: .3s ease-in-out;
+
+    svg {
+      fill: #fff;
+    }
+  }
+
+  &:hover {
+    color: #fff;
+    background: #338576;
+
+    span {
+      background: #006654;
+    }
+  }
+}
+
 .footer {
   background: transparent;
   height: 78px;
@@ -7,6 +51,7 @@
     height: auto;
     margin-bottom: 30px;
   }
+
   &__inner {
     max-width: 1400px;
     width: 100%;
@@ -15,6 +60,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
+
     a {
       margin: 0 30px;
       font-size: 16px;
@@ -22,14 +68,17 @@
       color: var(--korichnevyy-svetlyy);
       text-decoration: none;
       transition: .3s ease-in-out;
+
       &:hover {
         color: var(--black);
       }
     }
+
     @include mixins.response(991px) {
       flex-direction: column;
       a {
         margin: 0;
+
         & + a {
           margin-top: 10px;
         }

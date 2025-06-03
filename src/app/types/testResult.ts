@@ -55,7 +55,11 @@ export interface TestStore {
     isTestPage: boolean;
     testTitle: string | null;
 
+    // testResult props
+    isTestResultPage: boolean;
+
     // Actions
+    setIsTestResultPage: (isTestResultPage: boolean) => void;
     setIsTestPage: (isTestPage: boolean) => void;
     setTestTitle: (title: string | null) => void;
     resetCurrentTest: () => void;

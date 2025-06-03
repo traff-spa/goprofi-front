@@ -1,10 +1,11 @@
 import { useNavigate } from 'react-router-dom';
+import ArrowIcon from '@/assets/icons/arrow-right.svg?react';
+import React from "react";
+
 import { ROUTES } from '@app/routes/paths';
 import '@app/styles/home.scss';
 import { useTestStore } from '@/store/testStore';
 import { useAuthStore } from '@/store/authStore';
-import ArrowIcon from '@/assets/icons/arrow-right.svg?react';
-import React from "react";
 
 const Main = () => {
   const { user } = useAuthStore();
@@ -36,14 +37,11 @@ const Main = () => {
       const testResult = await startTest(userId, testId);
 
       if (testResult) {
-        console.log('Test started successfully:', testResult);
         navigate(`/test/${testResult.id}`);
       } else {
-        console.error('Failed to start test: No test result returned');
         alert('Unable to start the test. Please try again later.');
       }
     } catch (error) {
-      console.error('Error starting test:', error);
       alert('Unable to start the test. Please try again later.');
     }
   };

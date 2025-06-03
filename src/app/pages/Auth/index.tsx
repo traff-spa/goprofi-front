@@ -24,7 +24,6 @@ const Auth = () => {
     const token = params.get('token');
 
     if (token) {
-      console.log('Google auth token detected in URL');
       setIsLoading(true);
 
       // Handle the Google OAuth callback
@@ -32,10 +31,9 @@ const Auth = () => {
           .then(response => {
             setUser(response.user);
             message.success('Google login successful!');
-            navigate(ROUTES.MAIN);
+            navigate(ROUTES.TEST_HISTORY);
           })
-          .catch(error => {
-            console.error('Failed to process Google login:', error);
+          .catch( () => {
             message.error('Google login failed. Please try again.');
           })
           .finally(() => {
@@ -49,7 +47,7 @@ const Auth = () => {
     try {
       await login(String(values.email).toLowerCase(), values.password);
       message.success('Login successful!');
-      navigate(ROUTES.MAIN);
+      navigate(ROUTES.TEST_HISTORY);
     } catch (error: any) {
       console.error('Login error:', error);
       message.error(error.message || 'Login failed. Please check your credentials.');
@@ -64,13 +62,12 @@ const Auth = () => {
       await register(
           values.email,
           values.password,
-          values.firstName || '',
-          values.lastName || ''
+          values.firstName as string,
+          values.lastName as string
       );
       message.success('Registration successful!');
       navigate(ROUTES.MAIN);
     } catch (error: any) {
-      console.error('Registration error:', error);
       message.error(error?.message || error?.[0]?.msg || 'Registration failed. Please try again.');
     } finally {
       setIsLoading(false);
@@ -84,7 +81,6 @@ const Auth = () => {
       loginWithGoogle();
       // Note: We won't reach this point as loginWithGoogle redirects the page
     } catch (error: any) {
-      console.error('Google login error:', error);
       message.error('Failed to initiate Google login');
       setIsLoading(false);
     }
