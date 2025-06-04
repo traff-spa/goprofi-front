@@ -56,13 +56,17 @@ export const useAuthStore = create<AuthState>()(
                         lastName,
                     });
                     localStorage.setItem('auth_token', response.token);
+
+                    const user = response.user;
+
                     set({
-                        user: response.user,
+                        user: user,
                         isAuthenticated: true,
                         isLoading: false,
                     });
 
                     useUserStore.setState({user: response.user, isAuthenticated: true});
+                    return user;
                 } catch (error: any) {
                     set({
                         error: error.message || 'Registration failed',
