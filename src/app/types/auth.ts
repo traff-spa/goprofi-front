@@ -52,7 +52,7 @@ export interface AuthState {
     setUser: (user: User) => void;
     clearUser: () => void;
     login: (email: string, password: string) => Promise<void>;
-    register: (email: string, password: string, firstName: string, lastName: string) => Promise<void>;
+    register: (email: string, password: string, firstName: string, lastName: string) => Promise<User>;
     checkAuth: () => Promise<void>;
     logout: () => void;
     loginWithGoogle: () => void;
