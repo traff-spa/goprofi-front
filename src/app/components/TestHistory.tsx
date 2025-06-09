@@ -40,8 +40,6 @@ export const TestHistory: React.FC = () => {
                 throw new Error(`Invalid user ID: ${user.id}`);
             }
 
-            console.log('Starting test for user:', user.id, 'converted to:', userId);
-
             // Default test ID
             const testId = 1;
 
