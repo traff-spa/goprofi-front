@@ -33,6 +33,7 @@ const initialState = {
     testPositions: {}
 };
 
+// @ts-ignore
 export const useTestStore = create<TestStore>()(
     persist(
         (set, get) => ({

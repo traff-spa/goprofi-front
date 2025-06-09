@@ -1,10 +1,18 @@
-import { Suspense } from 'react'
+import {Suspense, useEffect} from 'react'
 import { BrowserRouter } from 'react-router-dom';
 import { AppRoutes } from '@/app/routes';
 import { Spin } from 'antd';
 import { LoadingOutlined } from '@ant-design/icons';
+import {useAuthStore} from "@/store/authStore.ts";
+
 
 const App = () => {
+    const {checkAuth} = useAuthStore();
+
+    useEffect(() => {
+        checkAuth().catch(e=>console.error(e));
+    }, []);
+
   return (
     <BrowserRouter>
       <Suspense fallback={(

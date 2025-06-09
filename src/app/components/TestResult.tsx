@@ -101,7 +101,6 @@ const TestResult: React.FC = () => {
                             </React.Fragment>
                         ))}
 
-                        <p>{typeDetails.summary}</p>
                     </div>
                 </div>
             </div>
