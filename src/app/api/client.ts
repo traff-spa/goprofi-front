@@ -25,11 +25,6 @@ apiClient.interceptors.request.use(
 apiClient.interceptors.response.use(
     (response) => response,
     (error) => {
-        if (error.response?.status === 401) {
-            // Unauthorized - clear token and redirect to auth
-            localStorage.removeItem('auth_token');
-            window.location.href = '/auth';
-        }
         return Promise.reject(error);
     }
 );
@@ -45,15 +40,15 @@ export const request = async <T>(config: AxiosRequestConfig): Promise<T> => {
             status: 'error'
         };
 
-        // Only log in development mode
-        if (process.env.NODE_ENV !== 'production') {
-            console.error('API request failed:', {
-                url: config.url,
-                method: config.method,
-                status: error.response?.status,
-                message: errorResponse.message
-            });
-        }
+        // // Only log in development mode
+        // if (process.env.NODE_ENV !== 'production') {
+        //     console.error('API request failed:', {
+        //         url: config.url,
+        //         method: config.method,
+        //         status: error.response?.status,
+        //         message: errorResponse.message
+        //     });
+        // }
 
         throw errorResponse;
     }

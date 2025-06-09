@@ -14,10 +14,13 @@ import type {FieldLoginType, FieldRegistrationType} from '@app/types/auth.ts'
 const Auth = () => {
     const [isLoginMode, setIsLoginMode] = useState(true);
     const [isLoading, setIsLoading] = useState(false);
+    const [formErrors, setFormErrors] = useState<{[key: string]: string}>({});
+
     const {viewportWidth} = useGetViewport();
 
     const location = useLocation();
     const navigate = useNavigate();
+
     const {login, register, loginWithGoogle, setUser} = useAuthStore();
     const {startTest} = useTestStore();
 
@@ -53,6 +56,11 @@ const Auth = () => {
             navigate(ROUTES.TEST_HISTORY);
         } catch (error: any) {
             console.error('Login error:', error);
+
+            setFormErrors({
+                password: error.message || 'Login failed. Please check your credentials.'
+            });
+
             message.error(error.message || 'Login failed. Please check your credentials.');
         } finally {
             setIsLoading(false);
@@ -151,6 +159,8 @@ const Auth = () => {
                                     label="Пароль"
                                     name="password"
                                     rules={[{required: true, message: 'Введіть пароль'}]}
+                                    validateStatus={formErrors.password ? 'error' : ''}
+                                    help={formErrors.password}
                                 >
                                     <Input.Password placeholder="Введіть пароль"/>
                                 </Form.Item>

@@ -32,6 +32,8 @@ export const Header = () => {
         }
     };
 
+    const hasToken = !!localStorage.getItem('auth_token');
+
     const userDisplayName = user?.name || user?.firstName || user?.email;
 
     const items: MenuProps['items'] = [
@@ -97,7 +99,7 @@ export const Header = () => {
                         <div className="test-title">{testTitle}</div>
                     )}
                 </div>
-                {isAuthenticated ? (
+                {isAuthenticated && hasToken ? (
                     <Dropdown menu={{ items }} trigger={['click']}>
                         <div className="user-button">
                             <span><UserOutlined /></span>
