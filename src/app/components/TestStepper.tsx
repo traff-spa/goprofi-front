@@ -178,7 +178,7 @@ const TestStepper: FC<Props> = ({ testResultId, setCompleted, initialAnswers = {
         {/* Component UI, no changes needed here */}
         <div className="test-section__body">
           <div className="test-section__title">
-            Питання {currentStep + 1} з {totalQuestions}
+            Питання {currentStep + 1} з {totalQuestions + 1}
           </div>
           <div className="test-section__progress">
             <div
