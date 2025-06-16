@@ -57,7 +57,7 @@ export interface AuthState {
     checkAuth: () => Promise<void>;
     logout: () => void;
     loginWithGoogle: () => void;
-    handleGoogleCallback: (token: string) => Promise<void>;
+    handleGoogleCallback: (token: string) => Promise<User>;
     clearError: () => void;
 }
 

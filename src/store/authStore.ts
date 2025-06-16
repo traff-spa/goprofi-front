@@ -108,6 +108,7 @@ export const useAuthStore = create<AuthState>()(
                     });
 
                     useUserStore.setState({user, isAuthenticated: true});
+                    return  user ;
                 } catch (error: any) {
                     set({
                         error: error.message || 'Failed to process Google login',

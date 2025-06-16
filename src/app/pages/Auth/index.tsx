@@ -22,7 +22,44 @@ const Auth = () => {
     const navigate = useNavigate();
 
     const {login, register, loginWithGoogle, setUser} = useAuthStore();
-    const {startTest} = useTestStore();
+    const {startTest, fetchUserTestResults} = useTestStore();
+
+    const handlePostAuthRedirection = async (user: any) => {
+        try {
+            if (!user?.id) {
+                throw new Error('Invalid user data received');
+            }
+
+            const userId = parseInt(user.id.toString(), 10);
+            if (isNaN(userId)) {
+                throw new Error(`Invalid user ID: ${user.id}`);
+            }
+
+            // Check if user has any existing test results
+            const userTestResults = await fetchUserTestResults(userId);
+
+            if (userTestResults && userTestResults.length > 0) {
+                // User has test history, redirect to test history page
+                navigate(ROUTES.TEST_HISTORY);
+            } else {
+                // User has no tests, start a new test
+                const testId = 1; // Default test ID
+                const testResult = await startTest(userId, testId);
+
+                if (testResult) {
+                    navigate(`/test/${testResult.id}`);
+                } else {
+                    // Fallback if test creation fails
+                    message.error('Unable to start the test. Please try again later.');
+                    navigate(ROUTES.TEST_HISTORY);
+                }
+            }
+        } catch (error: any) {
+            console.error('Post-auth redirection error:', error);
+            message.error('Authentication successful, but navigation failed. Redirecting to test history.');
+            navigate(ROUTES.MAIN);
+        }
+    };
 
     // Check for token in URL when returning from Google OAuth
     useEffect(() => {
@@ -37,7 +74,7 @@ const Auth = () => {
                 .then(response => {
                     setUser(response.user);
                     message.success('Google login successful!');
-                    navigate(ROUTES.TEST_HISTORY);
+                    handlePostAuthRedirection(response.user);
                 })
                 .catch(() => {
                     message.error('Google login failed. Please try again.');

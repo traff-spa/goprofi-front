@@ -40,16 +40,6 @@ export const request = async <T>(config: AxiosRequestConfig): Promise<T> => {
             status: 'error'
         };
 
-        // // Only log in development mode
-        // if (process.env.NODE_ENV !== 'production') {
-        //     console.error('API request failed:', {
-        //         url: config.url,
-        //         method: config.method,
-        //         status: error.response?.status,
-        //         message: errorResponse.message
-        //     });
-        // }
-
         throw errorResponse;
     }
 };
