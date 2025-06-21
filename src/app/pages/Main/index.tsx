@@ -28,8 +28,6 @@ const Main = () => {
         throw new Error(`Invalid user ID: ${user.id}`);
       }
 
-      console.log('Starting test for user:', user.id, 'converted to:', userId);
-
       // Default test ID
       const testId = 1;
 
@@ -64,7 +62,7 @@ const Main = () => {
             </button>
           </div>
           <div className="main-section__right">
-            <img src="/images/main-section-img.png" width="704" height="677" alt="image" />
+            <img src="/images/main-section-img.png" width="706" height="679" alt="image" />
           </div>
         </div>
       </div>

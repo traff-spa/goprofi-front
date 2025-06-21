@@ -7,8 +7,7 @@ import type {
     TestsResponse,
     TestQuestionsResponse,
     SaveAnswersResponse,
-    TieBreakersResponse,
-    Question
+    TieBreakersResponse
 } from '@/app/types';
 
 export const testService = {
@@ -21,12 +20,6 @@ export const testService = {
     getTestById: (id: number) =>
         request<Test>({
             url: `/tests/${id}`,
-            method: 'GET',
-        }),
-
-    getQuestionById: (id: number) =>
-        request<Question>({
-            url: `/questions/${id}`,
             method: 'GET',
         }),
 

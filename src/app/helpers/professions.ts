@@ -1,4 +1,4 @@
-// noinspection SpellCheckingInspection
+// noinspection SpellCheckingInspection TODO: put this part into the backend
 
 import {ProfessionCategory, TypeDetails} from "@app/types/professions.ts";
 

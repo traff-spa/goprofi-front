@@ -6,7 +6,6 @@ import { ROUTES } from '@/app/routes/paths';
 
 export const AdminLayout: React.FC = () => {
     const location = useLocation();
-    debugger;
 
     // Admin sidebar navigation links
     const navLinks = [

@@ -243,7 +243,6 @@ export const useTestStore = create<TestStore>()(
                 }
             },
 
-            // Tie-breaking functionality
             fetchTieBreakers: async (testResultId: number): Promise<Question[]> => {
                 set({ isLoading: true, error: null });
 
@@ -253,8 +252,8 @@ export const useTestStore = create<TestStore>()(
                     // Transform the tied_type_ids into the expected format
                     const tiedTypeObjects = response.tied_type_ids.map(id => ({
                         type_id: id,
-                        name: "", // You'll need to populate this from your data
-                        score: 0  // Default score
+                        name: "",
+                        score: 0
                     }));
 
                     set({

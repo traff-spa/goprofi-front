@@ -18,7 +18,6 @@ import { useTestStore } from '@/store/testStore';
 const TestStepper: FC<Props> = ({ testResultId, setCompleted, initialAnswers = {} }) => {
   const navigate = useNavigate();
 
-  // Get the setIsTestPage and setTestTitle functions
   const setIsTestPage = useTestStore(state => state.setIsTestPage);
   const setTestTitle = useTestStore(state => state.setTestTitle);
 
@@ -40,12 +39,11 @@ const TestStepper: FC<Props> = ({ testResultId, setCompleted, initialAnswers = {
   // Calculate progress percentage
   const progressPercentage = calculateProgressPercentage(currentStep, totalQuestions);
 
-// Set the test page flag and title on the mount
+  // title and test flags, TODO: put this part into the backend
   useEffect(() => {
     setIsTestPage(true);
     setTestTitle('Тест "Хто я"');
 
-    // Clean up when a component unmounts
     return () => {
       setIsTestPage(false);
       setTestTitle('');
@@ -67,7 +65,7 @@ const TestStepper: FC<Props> = ({ testResultId, setCompleted, initialAnswers = {
             setCurrentTestQuestions(questions);
             setTotalQuestions(questions.length);
 
-            // Get saved position from Zustand
+            // Get saved position from store
             const savedStep = getTestPosition(testResultId);
 
             // Ensure saved step is within valid range
@@ -94,7 +92,6 @@ const TestStepper: FC<Props> = ({ testResultId, setCompleted, initialAnswers = {
     fetchTestData();
   }, [testResultId, currentStep, getTestPosition]);
 
-  // Handle option selection
   const handleOptionSelect = useCallback((questionId: number, optionId: number) => {
     setLocalAnswers(prev => ({
       ...prev,
@@ -102,25 +99,22 @@ const TestStepper: FC<Props> = ({ testResultId, setCompleted, initialAnswers = {
     }));
   }, []);
 
-  // Save the current step to Zustand whenever it changes
+  // Save the current step to store whenever it changes
   useEffect(() => {
     if (testResultId && currentStep >= 0) {
       saveTestPosition(testResultId, currentStep);
     }
   }, [currentStep, testResultId, saveTestPosition]);
 
-  // Handle next button click
   const handleNext = useCallback(async () => {
     if (!currentQuestion) return;
 
     try {
       setLoading(true);
 
-      // Save the current answer
       await saveAnswer(testResultId, currentQuestion.id, localAnswers[currentQuestion.id]);
 
       if (currentStep === totalQuestions - 1) {
-        // Complete the test
         await completeTest(testResultId);
 
         setCompleted(true);
@@ -134,7 +128,7 @@ const TestStepper: FC<Props> = ({ testResultId, setCompleted, initialAnswers = {
       const nextStep = currentStep + 1;
       setCurrentStep(nextStep);
 
-      // Save progress to Zustand
+      // Save progress to store
       saveTestPosition(testResultId, nextStep);
 
       // Get the next question from our already loaded questions
@@ -154,14 +148,14 @@ const TestStepper: FC<Props> = ({ testResultId, setCompleted, initialAnswers = {
       const prevStep = currentStep - 1;
       setCurrentStep(prevStep);
 
-      // Save progress to Zustand
+      // Save progress to store
       saveTestPosition(testResultId, prevStep);
 
       setCurrentQuestion(currentTestQuestions[prevStep]);
     }
   }, [currentStep, currentTestQuestions, testResultId, saveTestPosition]);
 
-  // UI states
+  // UI
   const isFirstStep = currentStep === 0;
   const isLastStep = currentStep === totalQuestions - 1;
   const isOptionSelected = currentQuestion ? !!localAnswers[currentQuestion.id] : false;
@@ -172,13 +166,11 @@ const TestStepper: FC<Props> = ({ testResultId, setCompleted, initialAnswers = {
     return <div className="test-section">Loading...</div>;
   }
 
-  // The rest of the component remains the same
   return (
       <div className="test-section">
-        {/* Component UI, no changes needed here */}
         <div className="test-section__body">
           <div className="test-section__title">
-            Питання {currentStep + 1} з {totalQuestions + 1}
+            Питання {currentStep + 1} з {totalQuestions}
           </div>
           <div className="test-section__progress">
             <div
@@ -187,7 +179,6 @@ const TestStepper: FC<Props> = ({ testResultId, setCompleted, initialAnswers = {
             />
           </div>
 
-          {/* Question and options */}
           <div className="questions">
             <div className="questions__title">{currentQuestion.text}</div>
             <div className="questions__list">
