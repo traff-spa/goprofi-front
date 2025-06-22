@@ -26,7 +26,42 @@ const TestStepper: FC<Props> = ({ testResultId, setCompleted, initialAnswers = {
   const getTestPosition = useTestStore(state => state.getTestPosition);
 
   // State management
-  const [currentQuestion, setCurrentQuestion] = useState<Question | null>(null);
+
+  // const [currentQuestion, setCurrentQuestion] = useState<Question | null>(null);
+  // TODO: test for view multiply
+  const [currentQuestion, setCurrentQuestion] = useState<Question | null>({
+    "id": 1,
+    "text": "Для мене важливо, щоб усе було зроблено правильно та відповідало встановленим стандартам.",
+    "isMultiple": true,
+    "options": [
+        {
+          "id": 1,
+          "text": "Вариант 1",
+          "option_order": 1
+        },
+        {
+          "id": 2,
+          "text": "Вариант 2",
+          "option_order": 2
+        },
+        {
+          "id": 3,
+          "text": "Вариант 3",
+          "option_order": 3
+        },
+        {
+          "id": 4,
+          "text": "Вариант 4",
+          "option_order": 4
+        },
+        {
+          "id": 5,
+          "text": "Вариант 5",
+          "option_order": 5
+        }
+    ]
+  });
+
   // Initialize from Zustand store instead of localStorage
   const [currentStep, setCurrentStep] = useState<number>(() => {
     return testResultId ? getTestPosition(testResultId) : 0;
@@ -34,7 +69,97 @@ const TestStepper: FC<Props> = ({ testResultId, setCompleted, initialAnswers = {
   const [totalQuestions, setTotalQuestions] = useState(0);
   const [localAnswers, setLocalAnswers] = useState<{[key: number]: number}>(initialAnswers);
   const [loading, setLoading] = useState(false);
-  const [currentTestQuestions, setCurrentTestQuestions] = useState<Question[]>([]);
+
+  // const [currentTestQuestions, setCurrentTestQuestions] = useState<Question[]>([]);
+  // TODO: test for view multiply
+  const [currentTestQuestions, setCurrentTestQuestions] = useState<Question[]>([
+      {
+          "id": 1,
+          "text": "Для мене важливо, щоб усе було зроблено правильно та відповідало встановленим стандартам.",
+          "isMultiple": true,
+          "options": [
+              {
+                "id": 1,
+                "text": "Вариант 1",
+                "option_order": 1
+              },
+              {
+                "id": 2,
+                "text": "Вариант 2",
+                "option_order": 2
+              },
+              {
+                "id": 3,
+                "text": "Вариант 3",
+                "option_order": 3
+              },
+              {
+                "id": 4,
+                "text": "Вариант 4",
+                "option_order": 4
+              },
+              {
+                "id": 5,
+                "text": "Вариант 5",
+                "option_order": 5
+              }
+          ]
+      },
+      {
+          "id": 2,
+          "text": "Я відчуваю внутрішнє напруження, коли бачу, що щось робиться неправильно або недосконало.",
+          "isMultiple": true,
+          "options": [
+              {
+                "id": 6,
+                "text": "Вариант 1",
+                "option_order": 1
+              },
+              {
+                "id": 7,
+                "text": "Вариант 2",
+                "option_order": 2
+              },
+              {
+                "id": 8,
+                "text": "Вариант 3",
+                "option_order": 3
+              },
+              {
+                "id": 9,
+                "text": "Вариант 4",
+                "option_order": 4
+              },
+              {
+                "id": 10,
+                "text": "Вариант 5",
+                "option_order": 5
+              }
+          ]
+      },
+      {
+          "id": 3,
+          "text": "Я відчуваю задоволення, коли бачу, що моя робота відповідає високим стандартам якості.",
+          "isMultiple": true,
+          "options": [
+              {
+                "id": 10,
+                "text": "Вариант 1",
+                "option_order": 1
+              },
+              {
+                "id": 11,
+                "text": "Вариант 2",
+                "option_order": 2
+              },
+              {
+                "id": 12,
+                "text": "Вариант 3",
+                "option_order": 3
+              }
+          ]
+      }
+  ]);
 
   // Calculate progress percentage
   const progressPercentage = calculateProgressPercentage(currentStep, totalQuestions);
@@ -92,12 +217,38 @@ const TestStepper: FC<Props> = ({ testResultId, setCompleted, initialAnswers = {
     fetchTestData();
   }, [testResultId, currentStep, getTestPosition]);
 
+  // TODO: OLD LOGIC
+  // const handleOptionSelect = useCallback((questionId: number, optionId: number) => {
+  //   setLocalAnswers(prev => ({
+  //     ...prev,
+  //     [questionId]: optionId
+  //   }));
+  // }, []);
   const handleOptionSelect = useCallback((questionId: number, optionId: number) => {
-    setLocalAnswers(prev => ({
-      ...prev,
-      [questionId]: optionId
-    }));
-  }, []);
+    setLocalAnswers(prev => {
+      const currentAnswer = prev[questionId];
+      const question = currentTestQuestions.find(q => q.id === questionId);
+
+      console.log('question ===>', question)
+
+      if (question?.isMultiple) {
+        const selected = Array.isArray(currentAnswer) ? currentAnswer : [];
+        const exists = selected.includes(optionId);
+
+        return {
+          ...prev,
+          [questionId]: exists
+            ? selected.filter(id => id !== optionId)
+            : [...selected, optionId],
+        };
+      }
+
+      return {
+        ...prev,
+        [questionId]: optionId
+      };
+    });
+  }, [currentTestQuestions]);
 
   // Save the current step to store whenever it changes
   useEffect(() => {
@@ -113,6 +264,15 @@ const TestStepper: FC<Props> = ({ testResultId, setCompleted, initialAnswers = {
       setLoading(true);
 
       await saveAnswer(testResultId, currentQuestion.id, localAnswers[currentQuestion.id]);
+      // TODO: нужно будет обновить saveAnswer() что-то типо вот так
+
+      // await saveAnswer(
+      //   testResultId,
+      //   currentQuestion.id,
+      //   currentQuestion.isMultiple
+      //     ? (localAnswers[currentQuestion.id] as number[])
+      //     : (localAnswers[currentQuestion.id] as number)
+      // );
 
       if (currentStep === totalQuestions - 1) {
         await completeTest(testResultId);
@@ -158,7 +318,14 @@ const TestStepper: FC<Props> = ({ testResultId, setCompleted, initialAnswers = {
   // UI
   const isFirstStep = currentStep === 0;
   const isLastStep = currentStep === totalQuestions - 1;
-  const isOptionSelected = currentQuestion ? !!localAnswers[currentQuestion.id] : false;
+  
+  // TODO: OLD LOGIC
+  // const isOptionSelected = currentQuestion ? !!localAnswers[currentQuestion.id] : false;
+  const isOptionSelected = currentQuestion
+  ? currentQuestion.isMultiple
+    ? Array.isArray(localAnswers[currentQuestion.id]) && (localAnswers[currentQuestion.id] as number[]).length > 0
+    : !!localAnswers[currentQuestion.id]
+  : false;
 
   const cursorStyle = { cursor: loading ? 'wait' : 'pointer' };
 
@@ -180,8 +347,9 @@ const TestStepper: FC<Props> = ({ testResultId, setCompleted, initialAnswers = {
           </div>
 
           <div className="questions">
-            <div className="questions__title">{currentQuestion.text}</div>
-            <div className="questions__list">
+            <div className="questions__title">{currentQuestion?.text}</div>
+            {/* TODO: OLD LOGIC */}
+            {/* <div className="questions__list">
               {currentQuestion.options.map((option) => (
                   <div
                       key={option.id}
@@ -211,6 +379,61 @@ const TestStepper: FC<Props> = ({ testResultId, setCompleted, initialAnswers = {
                     </div>
                   </div>
               ))}
+            </div> */}
+            <div className="questions__list">
+              {currentQuestion.isMultiple ? (
+                // for multyply
+                currentQuestion.options.map((option) => {
+                  const selected = Array.isArray(localAnswers[currentQuestion.id])
+                    ? (localAnswers[currentQuestion.id] as number[]).includes(option.id)
+                    : false;
+
+                  return (
+                    <div
+                      key={option.id}
+                      className={`questions__item ${selected ? 'selected' : ''}`}
+                      onClick={() => !loading && handleOptionSelect(currentQuestion.id, option.id)}
+                      style={cursorStyle}
+                    >
+                      <div className="checkbox-wrapper">
+                        <input
+                          type="checkbox"
+                          id={`option-${option.id}`}
+                          name={`question-${currentQuestion.id}`}
+                          value={option.id.toString()}
+                          checked={selected}
+                          readOnly
+                        />
+                        <span style={cursorStyle}>{option.text}</span>
+                      </div>
+                    </div>
+                  );
+                })
+              ) : (
+                // for single
+                currentQuestion?.options?.map((option) => (
+                  <div
+                    key={option.id}
+                    className={`questions__item ${
+                      localAnswers[currentQuestion.id] === option.id ? 'selected' : ''
+                    }`}
+                    onClick={() => !loading && handleOptionSelect(currentQuestion.id, option.id)}
+                    style={cursorStyle}
+                  >
+                    <div className="radio-wrapper">
+                      <input
+                        type="radio"
+                        id={`option-${option.id}`}
+                        name={`question-${currentQuestion.id}`}
+                        value={option.id.toString()}
+                        checked={localAnswers[currentQuestion.id] === option.id}
+                        readOnly
+                      />
+                      <span style={cursorStyle}>{option.text}</span>
+                    </div>
+                  </div>
+                ))
+              )}
             </div>
           </div>
         </div>

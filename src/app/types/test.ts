@@ -21,6 +21,7 @@ export interface QuestionOption {
     text: string;
     value: number;
     option_order: number | null;
+    isMultiple?: boolean // TODO: Признак того что можно выбрать несколько вариантов ответов
 }
 
 export interface Question {
@@ -32,6 +33,7 @@ export interface Question {
     question_order: number | null;
     is_active: boolean;
     options: QuestionOption[];
+    isMultiple?: boolean // TODO: Признак того что можно выбрать несколько вариантов ответов
 }
 
 // Updated Answer type to match backend
