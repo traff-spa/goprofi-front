@@ -79,7 +79,6 @@ export const testService = {
         });
     },
 
-    // Tie-breaking functionality
     getTieBreakers: (testResultId: number) => {
         return request<TieBreakersResponse>({
             url: `/test-results/${testResultId}/tie-breaker`,

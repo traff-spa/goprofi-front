@@ -12,6 +12,7 @@ import '@/app/styles/header.scss';
 import { ROUTES } from '@/app/routes/paths';
 import { useAuthStore } from '@/store/authStore';
 import { useTestStore } from "@/store/testStore";
+import {useEffect} from "react";
 
 export const Header = () => {
     const location = useLocation();
@@ -24,13 +25,21 @@ export const Header = () => {
     const isTestPage = useTestStore(state => state.isTestPage);
     const testTitle = useTestStore(state => state.testTitle);
     const isTestResultPage = useTestStore(state => state.isTestResultPage);
+    const {setIsNewTestPage} = useTestStore();
 
     const onLogout = () => {
         logout();
         if (!isMainPage) {
             navigate(ROUTES.MAIN);
+            setIsNewTestPage(false);
         }
     };
+
+    useEffect(() => {
+        if (!isTestPage) {
+            setIsNewTestPage(false);
+        }
+    }, [isTestPage]);
 
     const hasToken = !!localStorage.getItem('auth_token');
 

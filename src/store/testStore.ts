@@ -13,7 +13,8 @@ import type {
 // Initial state definition
 const initialState = {
     tests: [],
-    currentTest: null,
+    currentTest: {} as Test,
+    isNewTestPage: false,
     currentTestResult: null,
     currentTestQuestions: [],
     currentTestName: '',
@@ -28,6 +29,7 @@ const initialState = {
     tieBreakingQuestions: [],
     tiedTypes: [],
     isTieBreaking: false,
+    scenario_type: 'scenario_1',
     // Track when answers are saved to force UI updates
     lastSavedAnswerTimestamp: 0,
     testPositions: {}
@@ -40,7 +42,7 @@ export const useTestStore = create<TestStore>()(
 
             resetCurrentTest: () => {
                 set({
-                    currentTest: null,
+                    currentTest: {} as Test,
                     currentTestResult: null,
                     currentTestQuestions: [],
                     currentTestName: '',
@@ -68,6 +70,7 @@ export const useTestStore = create<TestStore>()(
                     }
 
                     set({
+                        isNewTestPage: true,
                         currentTestResult: testResult,
                         currentTestQuestions: questionsResponse.questions,
                         currentTestName: questionsResponse.test_name,
@@ -251,16 +254,16 @@ export const useTestStore = create<TestStore>()(
 
                     // Transform the tied_type_ids into the expected format
                     const tiedTypeObjects = response.tied_type_ids.map(id => ({
-                        type_id: id,
-                        name: "",
-                        score: 0
+                        test_result_id: response.test_result_id,
+                        tied_type_id: id
                     }));
 
                     set({
                         tieBreakingQuestions: response.questions,
                         tiedTypes: tiedTypeObjects,
                         isTieBreaking: true,
-                        isLoading: false
+                        isLoading: false,
+                        scenario_type: response.scenario_type
                     });
 
                     return response.questions;
@@ -317,15 +320,23 @@ export const useTestStore = create<TestStore>()(
                         [testResultId]: position
                     }
                 }));
+                return get().testPositions;
             },
 
             getTestPosition: (testResultId: number): number => {
                 const positions = get().testPositions;
-                return positions[testResultId] || 0;
+                const isNewTestPage = get().isNewTestPage;
+                const currentPosition = isNewTestPage ? 0 : (positions[testResultId] || 0); // fallback to 1st position
+                return currentPosition;
+            },
+
+            setIsNewTestPage: (isNewTestPage: boolean): void => {
+                return set({
+                    isNewTestPage : isNewTestPage
+                })
             },
 
             testPositions: initialState.testPositions,
-            // Add the timestamp field to the store state
             lastSavedAnswerTimestamp: initialState.lastSavedAnswerTimestamp
         }),
         {
@@ -341,18 +352,15 @@ export const useTestStore = create<TestStore>()(
     )
 );
 
-// Selector hooks with proper dependencies to trigger re-renders
 export const useTests = () => useTestStore(state => state.tests);
 export const useCurrentTest = () => useTestStore(state => state.currentTest);
 export const useCurrentTestResult = () => useTestStore(state => state.currentTestResult);
 
-// This selector now properly includes the timestamp in its dependencies
 export const useCurrentTestQuestions = () => {
     const store = useTestStore(state => ({
         questions: state.currentTestQuestions,
         timestamp: state.lastSavedAnswerTimestamp
     }));
-    // Return just the questions - the timestamp is only used to force re-renders
     return store.questions;
 };
 

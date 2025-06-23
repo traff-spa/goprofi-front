@@ -3,6 +3,8 @@ import react from '@vitejs/plugin-react'
 import svgr from 'vite-plugin-svgr'
 import { fileURLToPath } from 'url'
 import { nodePolyfills } from 'vite-plugin-node-polyfills'
+// import fs from 'fs';
+
 
 export default defineConfig({
   plugins: [
@@ -14,6 +16,10 @@ export default defineConfig({
     allowedHosts: ['goprofi.ai'],
     port: 3001,
     host: true
+    // https: {
+    //   key: fs.readFileSync('./app/ssl/server.key'),
+    //   cert: fs.readFileSync('./app/ssl/server.crt')
+    // }
   },
   resolve: {
     alias: {

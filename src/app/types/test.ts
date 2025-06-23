@@ -8,13 +8,6 @@ export interface Test {
     updated_at: string;
 }
 
-// export interface Category {
-//     id: number;
-//     test_id: number;
-//     name: string;
-//     description: string | null;
-// }
-
 export interface QuestionOption {
     id: number;
     question_id: number;
@@ -42,4 +35,36 @@ export interface Answer {
     selected_option_id: number;
     response_value?: number;
     is_tie_breaker?: boolean;
+}
+
+export interface UseTestNavigationProps {
+    testResultId: number;
+    totalQuestions: number;
+}
+
+export interface UseTestNavigationReturn {
+    currentStep: number;
+    isFirstStep: boolean;
+    isLastStep: boolean;
+    progressPercentage: number;
+    goNext: () => void;
+    goBack: () => void;
+}
+
+export interface UseTestDataReturn {
+    questions: Question[];
+    isLoading: boolean;
+    error: string | null;
+    // setQuestions: (changedState :Question[] ) => void;
+}
+
+export interface UseTestActionsProps {
+    testResultId: number;
+    onComplete: () => void;
+}
+
+export interface UseTestActionsReturn {
+    isSubmitting: boolean;
+    submitAnswer: (question: Question, answer: number | number[]) => Promise<void>;
+    finishTest: () => Promise<void | Question[]>;
 }

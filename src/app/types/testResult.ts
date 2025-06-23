@@ -25,6 +25,7 @@ export interface SaveAnswersResponse {
 
 export interface TieBreakersResponse {
     test_result_id: string;
+    scenario_type: string;
     tied_type_ids: number[];
     questions: Question[];
 }
@@ -48,12 +49,14 @@ export interface TestStore {
     error: string | null;
     // Tie-breaking properties
     tieBreakingQuestions: Question[];
-    tiedTypes: { type_id: number; name: string; score: number; }[];
+    tiedTypes: { test_result_id: string; tied_type_id: number; }[];
+    scenario_type: string,
     isTieBreaking: boolean;
 
     // testPage props
     isTestPage: boolean;
     testTitle: string | null;
+    isNewTestPage: boolean;
 
     // testResult props
     isTestResultPage: boolean;
@@ -77,8 +80,10 @@ export interface TestStore {
     lastSavedAnswerTimestamp: number;
     // Test position tracking
     testPositions: { [testResultId: number]: number };
-    saveTestPosition: (testResultId: number, position: number) => void;
+    saveTestPosition: (testResultId: number, position: number) => object;
     getTestPosition: (testResultId: number) => number;
+
+    setIsNewTestPage: (isNewTestPage: boolean) => void;
 }
 
 export interface ResultData {
@@ -113,7 +118,7 @@ export interface TestResult {
     completed_at: Date | null;
     primary_type_id?: number;
     primary_type?: PersonalityType;
-    result_data?: ResultData;
+    result_data: ResultData | any;
     progress?: number;
     used_tie_breaker?: boolean;
 }

@@ -22,7 +22,7 @@ export const TestHistory: React.FC = () => {
     const navigate = useNavigate();
     const { user } = useAuthStore();
 
-    const { startTest } = useTestStore();
+    const { startTest, resetCurrentTest } = useTestStore();
 
     const handleStartTest = async (e: React.MouseEvent<HTMLButtonElement>) => {
         e.preventDefault();
@@ -42,6 +42,8 @@ export const TestHistory: React.FC = () => {
 
             // Default test ID
             const testId = 1;
+
+            resetCurrentTest()
 
             // Start the test
             const testResult = await startTest(userId, testId);
@@ -71,7 +73,6 @@ export const TestHistory: React.FC = () => {
 
         const loadTestResults = async () => {
             try {
-                // Validate and convert user ID
                 const userId = validateUserId(user.id);
                 await fetchUserTestResults(userId);
             } catch (error) {

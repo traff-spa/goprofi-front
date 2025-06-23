@@ -8,7 +8,9 @@ import { Question, Answer } from '@/app/types';
  * @returns Progress percentage (0-100)
  */
 export const calculateProgressPercentage = (currentStep: number, totalQuestions: number): number => {
-    return totalQuestions > 0 ? ((currentStep + 1) / totalQuestions) * 100 : 0;
+    return totalQuestions > 0
+        ? Math.round((currentStep + 1) / totalQuestions * 100)
+        : 0;
 };
 
 /**
@@ -51,15 +53,14 @@ export const saveAnswer = async (
     testResultId: number,
     questionId: number,
     selectedOptionId: number
-): Promise<boolean> => {
+): Promise<any> => {
     try {
         const answer: Answer = {
             question_id: questionId,
             selected_option_id: selectedOptionId
         };
 
-        await testService.saveAnswers(testResultId, [answer]);
-        return true;
+        return await testService.saveAnswers(testResultId, [answer]);
     } catch (error) {
         console.error('Error saving answer:', error);
         return false;
@@ -71,10 +72,9 @@ export const saveAnswer = async (
  * @param testResultId - ID of the test result
  * @returns Success status
  */
-export const completeTest = async (testResultId: number): Promise<boolean> => {
+export const completeTest = async (testResultId: number): Promise<any> => {
     try {
-        await testService.completeTest(testResultId);
-        return true;
+        return await testService.completeTest(testResultId);
     } catch (error) {
         console.error('Error completing test:', error);
         return false;
