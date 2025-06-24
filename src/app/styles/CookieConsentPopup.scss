@@ -1,0 +1,201 @@
+// Variables
+$primary-color: #1890ff;
+$primary-hover-color: #40a9ff;
+$border-color: #d9d9d9;
+$text-color: #333333;
+$background-color: #ffffff;
+$shadow-color: rgba(0, 0, 0, 0.12);
+$mask-color: rgba(0, 0, 0, 0.3);
+
+.cookie-demo-container {
+  padding: 20px;
+  text-align: center;
+
+  .cookie-demo-button {
+    margin-bottom: 20px;
+  }
+
+  .cookie-demo-content {
+    margin-top: 100px;
+
+    h2 {
+      margin-bottom: 16px;
+    }
+
+    p {
+      margin-bottom: 8px;
+      line-height: 1.5;
+    }
+  }
+}
+
+.cookie-consent-modal {
+  position: fixed !important;
+  z-index: 9999 !important;
+
+  .ant-modal-mask {
+    background-color: $mask-color !important;
+  }
+
+  .ant-modal-body {
+    padding: 0 !important;
+  }
+
+  .cookie-consent-content {
+    padding: 24px;
+    max-width: 480px;
+    background-color: $background-color;
+    border-radius: 12px;
+    box-shadow: 0 8px 32px $shadow-color;
+    border: 1px solid #f0f0f0;
+  }
+
+  // Message section
+  .cookie-consent-message {
+    margin-bottom: 20px;
+
+    .cookie-consent-text {
+      font-size: 14px;
+      line-height: 1.6;
+      color: $text-color;
+      display: block;
+
+      .cookie-consent-inline-link {
+        color: $primary-color;
+        text-decoration: underline;
+        cursor: pointer;
+        transition: color 0.3s ease;
+
+        &:hover {
+          color: $primary-hover-color;
+        }
+      }
+    }
+  }
+
+  // Privacy policy link section
+  .cookie-consent-privacy-link {
+    margin-bottom: 24px;
+
+    .cookie-consent-privacy-link-text {
+      color: $primary-color;
+      font-size: 13px;
+      text-decoration: underline;
+      cursor: pointer;
+      transition: color 0.3s ease;
+
+      &:hover {
+        color: $primary-hover-color;
+      }
+    }
+  }
+
+  // Buttons section
+  .cookie-consent-buttons {
+    width: 100%;
+    justify-content: flex-end;
+
+    .cookie-consent-button {
+      border-radius: 6px;
+      height: 36px;
+      padding: 0 16px;
+      font-size: 14px;
+      font-weight: 500;
+      transition: all 0.3s ease;
+
+      &--reject {
+        border: 1px solid $border-color;
+        color: $text-color;
+        background-color: $background-color;
+
+        &:hover {
+          border-color: $primary-hover-color !important;
+          color: $primary-hover-color !important;
+          background-color: $background-color !important;
+        }
+
+        &:focus {
+          border-color: $primary-color !important;
+          color: $primary-color !important;
+        }
+      }
+
+      &--accept {
+        background-color: $primary-color;
+        border-color: $primary-color;
+
+        &:hover {
+          background-color: $primary-hover-color !important;
+          border-color: $primary-hover-color !important;
+        }
+
+        &:focus {
+          background-color: $primary-hover-color !important;
+          border-color: $primary-hover-color !important;
+        }
+      }
+    }
+  }
+}
+
+// Responsive styles
+@media (max-width: 768px) {
+  .cookie-consent-modal {
+    .ant-modal {
+      margin: 0 !important;
+      padding: 16px !important;
+    }
+
+    .ant-modal-content {
+      border-radius: 8px !important;
+    }
+
+    .cookie-consent-buttons {
+      flex-direction: column !important;
+      width: 100% !important;
+
+      .ant-btn {
+        width: 100% !important;
+        margin-bottom: 8px !important;
+
+        &:last-child {
+          margin-bottom: 0 !important;
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .cookie-consent-modal {
+    .cookie-consent-content {
+      padding: 20px !important;
+      max-width: none !important;
+    }
+  }
+
+  .cookie-demo-container {
+    padding: 16px;
+
+    .cookie-demo-content {
+      margin-top: 60px;
+    }
+  }
+}
+
+// Additional utility classes
+.cookie-consent-modal {
+  // Ensure modal stays fixed and doesn't scroll with page
+  .ant-modal-wrap {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+  }
+
+  // Prevent body scroll when modal is open
+  body.modal-open & {
+    overflow: hidden;
+  }
+}

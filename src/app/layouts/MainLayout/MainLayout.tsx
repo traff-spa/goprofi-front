@@ -3,6 +3,7 @@ import { Outlet, useLocation } from 'react-router-dom';
 import { Header } from './Header';
 import { Footer } from './Footer';
 import { ROUTES } from '@/app/routes/paths';
+import CookieConsentPopup from "@components/CookieConsentPopup.tsx";
 
 export const MainLayout: FC = () => {
     const location = useLocation();
@@ -14,6 +15,7 @@ export const MainLayout: FC = () => {
             <main className={isMainPage ? 'main-page' : 'main-layout__content'}>
                 <Outlet />
             </main>
+            <CookieConsentPopup/>
             {isMainPage && <Footer />}
         </div>
     );

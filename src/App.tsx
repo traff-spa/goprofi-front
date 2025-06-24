@@ -10,7 +10,7 @@ const App = () => {
     const {checkAuth} = useAuthStore();
 
     useEffect(() => {
-        checkAuth().catch(e=>console.error(e));
+        checkAuth().catch(e=>console.error(e, 'error during checkAuth()'));
     }, []);
 
   return (
