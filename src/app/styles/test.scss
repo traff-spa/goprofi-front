@@ -23,8 +23,23 @@
     background: var(--podlozhka);
     border-radius: 40px;
     padding: 44px 60px;
+
+    h1 {
+      font-size: 32px;
+      line-height: 145%;
+      font-weight: bold;
+      color: var(--black);
+      margin: 0 0 20px;
+      @include mixins.response(767px) {
+        font-weight: bold;
+        font-size: 24px;
+        line-height: 120%;
+      }
+    }
+
     @include mixins.response(767px) {
       padding: 20px 16px;
+      border-radius: 20px;
     }
   }
 
@@ -102,12 +117,26 @@
       }
     }
 
+    h2 {
+      font-size: 24px;
+      line-height: normal;
+      color: var(--black);
+      margin: 20px 0;
+      @include mixins.response(767px) {
+        font-size: 20px;
+      }
+    }
+
     h3, h4 {
       font-weight: 500;
       font-size: 18px;
       line-height: 140%;
       color: var(--black);
       margin: 0 0 10px;
+    }
+
+    ul, ol {
+      padding: 0 0 0 20px;
     }
 
     hr {
