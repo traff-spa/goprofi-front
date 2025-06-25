@@ -31,6 +31,7 @@ const CookieConsentPopup: React.FC = () => {
         if (!cookieConsent) {
             setIsVisible(true)
             setLoading(true);
+            document.body.style.setProperty('overflow-y', 'auto', 'important');
 
             setTimeout(() => {
                 setLoading(false);
