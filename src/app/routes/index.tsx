@@ -15,6 +15,8 @@ const TestHistoryPage = lazy(() => import('@/app/pages/TestHistory'));
 const TestPage = lazy(() => import('@/app/pages/Test'));
 const TestResultPage = lazy(() => import('@/app/pages/TestResult'));
 const PrivacyPolicy = lazy(() => import('@/app/pages/PrivacyPolicy'));
+const PublicOfferAgreement  = lazy(() => import("@app/pages/PublicOfferAgreement"));
+
 const NotFoundPage = lazy(() => import('@/app/pages/NotFound'));
 
 export const AppRoutes = () => {
@@ -23,7 +25,7 @@ export const AppRoutes = () => {
             <Route element={<MainLayout />}>
                 <Route path={ROUTES.MAIN} element={<MainPage />} />
                 <Route path={ROUTES.POLICY} element={<PrivacyPolicy />} />
-                <Route path="/tests/:id" element={<div>testListPage</div>} />
+                <Route path={ROUTES.OFFER} element={<PublicOfferAgreement/>} />
             </Route>
 
             <Route element={<AuthLayout />}>

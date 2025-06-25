@@ -9,7 +9,9 @@ export const Footer = () => (
             <Link to={ROUTES.POLICY}>
                 Політика конфіденційності
             </Link>
-            <a href="#">Договір оферти</a>
+            <Link to={ROUTES.OFFER}>
+                Договір оферти
+            </Link>
         </div>
     </footer>
 );
