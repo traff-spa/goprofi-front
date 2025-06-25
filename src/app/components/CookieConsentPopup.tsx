@@ -1,101 +1,121 @@
-import React, { useState, useEffect } from 'react';
-import { Button, Modal, Space, Typography } from 'antd';
-import '../styles/CookieConsentPopup.scss';
+import React, {useState, useEffect} from 'react';
+import {Button, Modal, Typography} from 'antd';
+import Cookies from 'js-cookie';
 
-const { Text, Link } = Typography;
+import '../styles/CookieConsentPopup.scss';
+import useGetViewport from "@app/hooks/useGetViewport.ts";
+
+const {Text, Link} = Typography;
 
 const CookieConsentPopup: React.FC = () => {
     const [isVisible, setIsVisible] = useState(false);
+    const {viewportWidth} = useGetViewport();
+
+    /**
+     * Remove all available cookies except the httpOnly.
+     */
+    function rejectAllCookies(): void {
+        const allCookies = Cookies.get(); // { name: value }
+
+        Object.keys(allCookies).forEach((cookieName) => {
+
+            Cookies.remove(cookieName);
+            Cookies.remove(cookieName, { path: '/' });
+        });
+    }
+
+    const cookieConsent = localStorage.getItem('cookieConsent');
+
     useEffect(() => {
-        const cookieConsent = localStorage.getItem('cookieConsent');
         if (!cookieConsent) {
             setIsVisible(true);
         }
-    }, []);
+    }, [cookieConsent]);
 
     const handleAcceptAll = () => {
         localStorage.setItem('cookieConsent', 'accepted');
         setIsVisible(false);
-        console.log('All cookies accepted');
     };
 
     const handleRejectAll = () => {
         localStorage.setItem('cookieConsent', 'rejected');
+        rejectAllCookies()
         setIsVisible(false);
-        console.log('All cookies rejected');
     };
 
     const openPrivacyPolicy = () => {
         window.open('/privacy-policy', '_blank');
-        console.log('privacy-policy window.open() func')
     };
 
     return (
         <>
-            <div className="cookie-demo-container">
-                <Button
-                    type="primary"
-                    onClick={() => setIsVisible(true)}
-                    className="cookie-demo-button"
-                >
-                    Показати Cookie Попап (для тестування)
-                </Button>
-            </div>
-
             <Modal
                 open={isVisible}
                 footer={null}
                 closable={false}
-                maskClosable={false}
-                centered
                 width="auto"
+                mask={false}
                 className="cookie-consent-modal"
             >
-                <div className="cookie-consent-content">
-                    <div className="cookie-consent-message">
-                        <Text className="cookie-consent-text">
-                            Ми використовуємо файли cookie переважно для аналітики, щоб покращити ваш досвід.
-                            Погоджуючись, ви погоджуєтеся на використання нами цих файлів cookie.
-                            Ви можете керувати своїми налаштуваннями або дізнатися більше про нашу{' '}
-                            <Link
-                                onClick={openPrivacyPolicy}
-                                className="cookie-consent-inline-link"
-                            >
-                                політику щодо файлів cookie
-                            </Link>
-                            .
+                <div className='text'>
+                    <div className="cookie-consent-title">
+                        <Text className="cookie-consent-title-text">
+                            We use cookies 🍪
                         </Text>
                     </div>
 
-                    <div className="cookie-consent-privacy-link">
-                        <Link
-                            onClick={openPrivacyPolicy}
-                            className="cookie-consent-privacy-link-text"
-                        >
-                            Політика конфіденціальності
+                    <div className="cookie-consent-message">
+                        <Text className="cookie-consent-text">
+                            We use cookies primarily for analytics to enhance your experience.
+                            By accepting, you agree to our use of these cookies. You can
+                            manage your preferences or learn more about our cookie policy.
+                        </Text>
+                    </div>
+                </div>
+
+                {viewportWidth > 767 ?
+                    <div className="privacy_block">
+                        <Link onClick={openPrivacyPolicy}
+                            className="cookie-consent-privacy-link-text">
+                            Privacy Policy →
+                        </Link>
+                        <div className="cookie-consent-buttons">
+                            <Button
+                                onClick={handleRejectAll}
+                                className="cookie-consent-button cookie-consent-button--reject"
+                            >
+                                Reject all
+                            </Button>
+                            <Button
+                                onClick={handleAcceptAll}
+                                className="cookie-consent-button cookie-consent-button--accept"
+                            >
+                                Accept all
+                            </Button>
+                        </div>
+                    </div>
+                    :
+                    <div className="privacy_block">
+                        <div className="cookie-consent-buttons">
+                            <Button
+                                onClick={handleRejectAll}
+                                className="cookie-consent-button cookie-consent-button--reject"
+                            >
+                                Reject all
+                            </Button>
+                            <Button
+                                onClick={handleAcceptAll}
+                                className="cookie-consent-button cookie-consent-button--accept"
+                            >
+                                Accept all
+                            </Button>
+                        </div>
+                        <Link onClick={openPrivacyPolicy}
+                              className="cookie-consent-privacy-link-text">
+                            Privacy Policy →
                         </Link>
                     </div>
-
-                    <Space
-                        direction="horizontal"
-                        size="middle"
-                        className="cookie-consent-buttons"
-                    >
-                        <Button
-                            onClick={handleRejectAll}
-                            className="cookie-consent-button cookie-consent-button--reject"
-                        >
-                            Відхилити всі
-                        </Button>
-                        <Button
-                            type="primary"
-                            onClick={handleAcceptAll}
-                            className="cookie-consent-button cookie-consent-button--accept"
-                        >
-                            Прийняти всі
-                        </Button>
-                    </Space>
-                </div>
+                }
             </Modal>
         </>
     );

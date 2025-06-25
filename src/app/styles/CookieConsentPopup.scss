@@ -1,201 +1,232 @@
-// Variables
-$primary-color: #1890ff;
-$primary-hover-color: #40a9ff;
-$border-color: #d9d9d9;
-$text-color: #333333;
-$background-color: #ffffff;
-$shadow-color: rgba(0, 0, 0, 0.12);
-$mask-color: rgba(0, 0, 0, 0.3);
+$border-color: #EEEEEE;
+$text-primary: #141414;
+$text-secondary: #666666;
+$brown-background: #726C69;
+$text-muted: #333333;
+$background-white: #FFFFFF;
+$background-light: #F5F5F5;
+$desktop-accept-background: #EFEBE8;
+$shadow-main: 0px 4px 30px rgba(217, 216, 214, 0.5);
 
-.cookie-demo-container {
-  padding: 20px;
-  text-align: center;
-
-  .cookie-demo-button {
-    margin-bottom: 20px;
+// Mobile resolution (max-width: 767px)
+@media screen and (max-width: 767px) {
+  .ant-modal-content {
+    width: 343px !important;
+    height: 214px !important;
+    padding: 16px !important;
+    gap: 13px;
+    border-radius: 20px !important;
+    border-width: 1px !important;
   }
 
-  .cookie-demo-content {
-    margin-top: 100px;
-
-    h2 {
-      margin-bottom: 16px;
-    }
-
-    p {
-      margin-bottom: 8px;
-      line-height: 1.5;
-    }
-  }
-}
-
-.cookie-consent-modal {
-  position: fixed !important;
-  z-index: 9999 !important;
-
-  .ant-modal-mask {
-    background-color: $mask-color !important;
+  .cookie-consent-title-text {
+    font-size: 14px;
   }
 
-  .ant-modal-body {
-    padding: 0 !important;
+  .cookie-consent-modal {
+    //top: 555px !important;
+    position: absolute !important;
+    bottom: 0 !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
   }
 
-  .cookie-consent-content {
-    padding: 24px;
-    max-width: 480px;
-    background-color: $background-color;
-    border-radius: 12px;
-    box-shadow: 0 8px 32px $shadow-color;
-    border: 1px solid #f0f0f0;
-  }
-
-  // Message section
-  .cookie-consent-message {
-    margin-bottom: 20px;
-
-    .cookie-consent-text {
-      font-size: 14px;
-      line-height: 1.6;
-      color: $text-color;
-      display: block;
-
-      .cookie-consent-inline-link {
-        color: $primary-color;
-        text-decoration: underline;
-        cursor: pointer;
-        transition: color 0.3s ease;
-
-        &:hover {
-          color: $primary-hover-color;
-        }
-      }
-    }
-  }
-
-  // Privacy policy link section
-  .cookie-consent-privacy-link {
-    margin-bottom: 24px;
-
-    .cookie-consent-privacy-link-text {
-      color: $primary-color;
-      font-size: 13px;
-      text-decoration: underline;
-      cursor: pointer;
-      transition: color 0.3s ease;
-
-      &:hover {
-        color: $primary-hover-color;
-      }
-    }
-  }
-
-  // Buttons section
-  .cookie-consent-buttons {
+  .privacy_block {
     width: 100%;
-    justify-content: flex-end;
+    flex-direction: column;
+    gap: 14px;
+
+    &.ant-space {
+      flex-direction: column;
+    }
+  }
+
+  .cookie-consent-buttons {
+    width: 311px;
+    height: 40px;
+    gap: 10px;
 
     .cookie-consent-button {
-      border-radius: 6px;
-      height: 36px;
-      padding: 0 16px;
-      font-size: 14px;
-      font-weight: 500;
-      transition: all 0.3s ease;
+      flex: 1;
+      width: 150px !important;
+      height: 40px;
+      padding: 10px 16px;
 
-      &--reject {
-        border: 1px solid $border-color;
-        color: $text-color;
-        background-color: $background-color;
-
-        &:hover {
-          border-color: $primary-hover-color !important;
-          color: $primary-hover-color !important;
-          background-color: $background-color !important;
-        }
-
-        &:focus {
-          border-color: $primary-color !important;
-          color: $primary-color !important;
-        }
+      &--reject, &--accept {
+        width: auto;
       }
 
       &--accept {
-        background-color: $primary-color;
-        border-color: $primary-color;
-
-        &:hover {
-          background-color: $primary-hover-color !important;
-          border-color: $primary-hover-color !important;
-        }
-
-        &:focus {
-          background-color: $primary-hover-color !important;
-          border-color: $primary-hover-color !important;
-        }
+        color: $background-white !important;
+        background-color: $brown-background;
       }
     }
+
+    .cookie-consent-button--accept:hover {
+      color: $text-primary !important;
+    }
+  }
+
+  .text {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .cookie-consent-privacy-link-text {
+    font-size: 12px!important;
+    color: $text-primary;
+    text-align: center;
+    line-height: 160%;
   }
 }
 
-// Responsive styles
-@media (max-width: 768px) {
+@media (min-width: 768px) and (max-width: 991px) {
   .cookie-consent-modal {
-    .ant-modal {
-      margin: 0 !important;
-      padding: 16px !important;
-    }
-
-    .ant-modal-content {
-      border-radius: 8px !important;
-    }
-
-    .cookie-consent-buttons {
-      flex-direction: column !important;
-      width: 100% !important;
-
-      .ant-btn {
-        width: 100% !important;
-        margin-bottom: 8px !important;
-
-        &:last-child {
-          margin-bottom: 0 !important;
-        }
-      }
-    }
-  }
-}
-
-@media (max-width: 480px) {
-  .cookie-consent-modal {
-    .cookie-consent-content {
-      padding: 20px !important;
-      max-width: none !important;
-    }
-  }
-
-  .cookie-demo-container {
-    padding: 16px;
-
-    .cookie-demo-content {
-      margin-top: 60px;
-    }
-  }
-}
-
-// Additional utility classes
-.cookie-consent-modal {
-  // Ensure modal stays fixed and doesn't scroll with page
-  .ant-modal-wrap {
-    position: fixed !important;
-    top: 0 !important;
-    left: 0 !important;
-    right: 0 !important;
+    position: absolute !important;
     bottom: 0 !important;
+    left: 50% !important;
+    transform: translateX(-50%) translateY(50%) !important;
+  }
+}
+
+@media (min-width: 992px) and (max-width: 1530px) {
+  .cookie-consent-modal {
+    position: absolute !important;
+    bottom: 0 !important;
+    left: 50% !important;
+  }
+}
+
+
+.ant-modal-content {
+  padding: 20px !important;
+  width: 480px !important;
+  height: 190px !important;
+  background: $background-white;
+  border: 1px solid $border-color;
+  border-radius: 20px !important;
+}
+
+.cookie-consent-content {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 100%;
+  height: 100%;
+}
+
+.ant-modal-body {
+  display: flex;
+  flex-direction: column;
+}
+
+.cookie-consent-title-text {
+  font-style: normal;
+  font-weight: 700;
+  font-size: 16px;
+  line-height: 160%;
+  color: $text-primary;
+  margin: 0;
+}
+
+.cookie-consent-message {
+  flex: 1;
+  width: 100%;
+
+  .cookie-consent-text {
+    font-family: Manrope, sans-serif;
+    font-size: 12px !important;
+    line-height: 140%;
+    font-weight: 500 !important;
+    color: $text-primary;
+    margin: 0 !important;
+    letter-spacing: 0 !important;
+  }
+}
+
+.privacy_block {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 440px;
+}
+
+.cookie-consent-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+
+.cookie-consent-button {
+  height: 40px;
+  border-radius: 10px;
+  font-style: normal;
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  padding: 10px 24px;
+  border-width: 1px;
+  border-style: solid;
+
+  &--reject {
+    width: 109px;
+    background: $background-white;
+    border-color: $desktop-accept-background;
+    color: $text-primary !important;
+
+    &:hover {
+      background: $background-light;
+      border-color: $text-muted !important;
+      color: $text-muted !important;
+    }
   }
 
-  // Prevent body scroll when modal is open
-  body.modal-open & {
-    overflow: hidden;
+  &--accept {
+    width: 113px;
+    background: $desktop-accept-background;
+    border-color: $desktop-accept-background;
+    color: $text-primary !important;
+
+    &:hover {
+      background: #E5E1DE !important;
+      border-color: $text-muted !important;
+      color: $text-muted !important;
+    }
   }
+}
+
+.cookie-consent-modal {
+  top: 625px;
+  left: 1020px;
+  column-gap: 10px;
+
+  .cookie-consent-privacy-link-text {
+    font-style: normal;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 20px;
+    color: $text-primary !important;
+    cursor: pointer;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+
+.ant-modal-mask {
+  background: transparent;
+  pointer-events: none;
+}
+
+.ant-modal-wrap {
+  pointer-events: none;
+}
+
+.ant-modal {
+  pointer-events: all;
 }
