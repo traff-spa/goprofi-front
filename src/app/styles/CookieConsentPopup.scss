@@ -8,97 +8,6 @@ $background-light: #F5F5F5;
 $desktop-accept-background: #EFEBE8;
 $shadow-main: 0px 4px 30px rgba(217, 216, 214, 0.5);
 
-// Mobile resolution (max-width: 767px)
-@media screen and (max-width: 767px) {
-  .ant-modal-content {
-    width: 343px !important;
-    height: 214px !important;
-    padding: 16px !important;
-    gap: 13px;
-    border-radius: 20px !important;
-    border-width: 1px !important;
-  }
-
-  .cookie-consent-title-text {
-    font-size: 14px;
-  }
-
-  .cookie-consent-modal {
-    //top: 555px !important;
-    position: absolute !important;
-    bottom: 0 !important;
-    left: 50% !important;
-    transform: translateX(-50%) !important;
-  }
-
-  .privacy_block {
-    width: 100%;
-    flex-direction: column;
-    gap: 14px;
-
-    &.ant-space {
-      flex-direction: column;
-    }
-  }
-
-  .cookie-consent-buttons {
-    width: 311px;
-    height: 40px;
-    gap: 10px;
-
-    .cookie-consent-button {
-      flex: 1;
-      width: 150px !important;
-      height: 40px;
-      padding: 10px 16px;
-
-      &--reject, &--accept {
-        width: auto;
-      }
-
-      &--accept {
-        color: $background-white !important;
-        background-color: $brown-background;
-      }
-    }
-
-    .cookie-consent-button--accept:hover {
-      color: $text-primary !important;
-    }
-  }
-
-  .text {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
-
-  .cookie-consent-privacy-link-text {
-    font-size: 12px!important;
-    color: $text-primary;
-    text-align: center;
-    line-height: 160%;
-  }
-}
-
-@media (min-width: 768px) and (max-width: 991px) {
-  .cookie-consent-modal {
-    position: absolute !important;
-    bottom: 0 !important;
-    left: 50% !important;
-    transform: translateX(-50%) translateY(50%) !important;
-  }
-}
-
-@media (min-width: 992px) and (max-width: 1530px) {
-  .cookie-consent-modal {
-    position: absolute !important;
-    bottom: 0 !important;
-    left: 50% !important;
-  }
-}
-
-
 .ant-modal-content {
   padding: 20px !important;
   width: 480px !important;
@@ -200,9 +109,12 @@ $shadow-main: 0px 4px 30px rgba(217, 216, 214, 0.5);
 }
 
 .cookie-consent-modal {
-  top: 625px;
-  left: 1020px;
+  position: fixed !important;
+  bottom: 85px;
+  right: 100px;
+  top: auto !important;
   column-gap: 10px;
+  padding: 0;
 
   .cookie-consent-privacy-link-text {
     font-style: normal;
@@ -229,4 +141,96 @@ $shadow-main: 0px 4px 30px rgba(217, 216, 214, 0.5);
 
 .ant-modal {
   pointer-events: all;
+}
+
+@media screen and (max-width: 1530px) {
+  .cookie-consent-modal {
+    position: fixed !important;
+    bottom: 85px;
+    right: 100px;
+    top: auto!important;
+  }
+}
+
+@media screen and (max-width: 991px) {
+  .cookie-consent-modal {
+    position: fixed !important;
+    bottom: 85px;
+    right: 100px;
+    //position: absolute !important;
+    //bottom: 0 !important;
+    //left: 50% !important;
+    //transform: translateX(-50%) translateY(50%) !important;
+  }
+}
+
+@media screen and (max-width: 767px) {
+  .ant-modal-content {
+    width: 343px !important;
+    height: 214px !important;
+    padding: 16px !important;
+    gap: 13px;
+    border-radius: 20px !important;
+    border-width: 1px !important;
+  }
+
+  .cookie-consent-title-text {
+    font-size: 14px;
+  }
+
+  .cookie-consent-modal {
+    position: fixed!important;
+    bottom: 21px !important;
+    right: 16px;
+    left: 16px;
+  }
+
+  .privacy_block {
+    width: 100%;
+    flex-direction: column;
+    gap: 14px;
+
+    &.ant-space {
+      flex-direction: column;
+    }
+  }
+
+  .cookie-consent-buttons {
+    width: 311px;
+    height: 40px;
+    gap: 10px;
+
+    .cookie-consent-button {
+      flex: 1;
+      width: 150px !important;
+      height: 40px;
+      padding: 10px 16px;
+
+      &--reject, &--accept {
+        width: auto;
+      }
+
+      &--accept {
+        color: $background-white !important;
+        background-color: $brown-background;
+      }
+    }
+
+    .cookie-consent-button--accept:hover {
+      color: $text-primary !important;
+    }
+  }
+
+  .text {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .cookie-consent-privacy-link-text {
+    font-size: 12px!important;
+    color: $text-primary;
+    text-align: center;
+    line-height: 160%;
+  }
 }
