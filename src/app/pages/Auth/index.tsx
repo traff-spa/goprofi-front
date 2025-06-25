@@ -148,7 +148,6 @@ const Auth = () => {
         setIsLoading(true);
         try {
             loginWithGoogle();
-            // Note: We won't reach this point as loginWithGoogle redirects the page
         } catch (error: any) {
             message.error('Failed to initiate Google login');
             setIsLoading(false);
