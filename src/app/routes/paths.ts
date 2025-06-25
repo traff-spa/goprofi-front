@@ -6,5 +6,6 @@ export const ROUTES = {
   TEST_PAGE: '/test/:id',
   ADMIN: '/admin',
   POLICY: '/privacy-policy',
-  OFFER: '/public-offer-agreement'
+  OFFER: '/public-offer-agreement',
+  TERMS: '/terms-and-conditions'
 } as const;

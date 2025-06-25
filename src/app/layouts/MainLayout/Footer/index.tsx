@@ -12,6 +12,9 @@ export const Footer = () => (
             <Link to={ROUTES.OFFER}>
                 Договір оферти
             </Link>
+            <Link to={ROUTES.TERMS}>
+                Умови користування
+            </Link>
         </div>
     </footer>
 );
