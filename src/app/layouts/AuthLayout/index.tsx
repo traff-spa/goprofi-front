@@ -4,6 +4,7 @@ import { Outlet } from 'react-router-dom';
 import logo from '@/assets/logo.svg';
 import '@/app/styles/auth.scss';
 import { ROUTES } from '@/app/routes/paths';
+import CookieConsentPopup from "@components/CookieConsentPopup.tsx";
 
 export const AuthLayout: FC = () => {
     return (
@@ -17,6 +18,7 @@ export const AuthLayout: FC = () => {
             </header>
             <main className="auth-main">
                 <Outlet />
+                <CookieConsentPopup/>
             </main>
         </div>
     );
