@@ -9,6 +9,7 @@ const {Text, Link} = Typography;
 
 const CookieConsentPopup: React.FC = () => {
     const [isVisible, setIsVisible] = useState(false);
+    const [loading, setLoading] = React.useState<boolean>(true);
     const {viewportWidth} = useGetViewport();
 
     /**
@@ -28,7 +29,12 @@ const CookieConsentPopup: React.FC = () => {
 
     useEffect(() => {
         if (!cookieConsent) {
-            setIsVisible(true);
+            setIsVisible(true)
+            setLoading(true);
+
+            setTimeout(() => {
+                setLoading(false);
+            }, 1000);
         }
     }, [cookieConsent]);
 
@@ -55,6 +61,7 @@ const CookieConsentPopup: React.FC = () => {
                 closable={false}
                 width="auto"
                 mask={false}
+                loading={loading}
                 className="cookie-consent-modal"
             >
                 <div className='text'>
