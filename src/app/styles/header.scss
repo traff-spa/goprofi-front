@@ -4,9 +4,12 @@
   height: 78px;
   background: transparent;
   @include mixins.response(991px) {
+    display: flex;
+    justify-content: space-between;
     margin-bottom: 22px;
     height: 60px;
   }
+
   &__inner {
     max-width: 1400px;
     width: 100%;
@@ -33,16 +36,20 @@
   color: var(--black);
   gap: 6px;
   transition: .3s ease-in-out;
+
   svg {
     fill: var(--black);
     transition: .3s ease-in-out;
   }
+
   &:hover {
     color: var(--blue);
+
     svg {
       fill: var(--blue);
     }
   }
+
   @include mixins.response(991px) {
     width: 108px;
     height: 40px;
@@ -73,6 +80,7 @@
   color: var(--black);
   cursor: pointer;
   transition: .3s ease-in-out;
+
   span {
     border-radius: 100px;
     width: 28px;
@@ -82,6 +90,7 @@
     align-items: center;
     justify-content: center;
   }
+
   @include mixins.hover() {
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
   }
@@ -99,6 +108,7 @@
     border-bottom: 1px solid var(--background);
     margin-bottom: 24px;
   }
+
   &__avatar {
     width: 66px;
     height: 66px;
@@ -108,10 +118,12 @@
     align-items: center;
     justify-content: center;
     position: relative;
+
     svg {
       width: 30px;
       height: 30px;
     }
+
     &::after {
       content: '';
       bottom: 0;
@@ -124,12 +136,14 @@
       background: #65AF4B;
     }
   }
+
   &__name {
     font-weight: 500;
     font-size: 18px;
     line-height: 140%;
     color: var(--black);
   }
+
   &__item,
   &__logout {
     display: flex;
@@ -142,25 +156,32 @@
     cursor: pointer;
     transition: .3s ease-in-out;
     margin-bottom: 18px;
+
     svg {
       fill: var(--black);
       transition: .3s ease-in-out;
     }
+
     &:hover {
       color: var(--blue) !important;
+
       svg {
         fill: var(--blue);
       }
     }
   }
+
   &__logout {
     color: #930000;
     margin: 100px 0 0;
+
     svg {
       fill: #930000;
     }
+
     &:hover {
       color: #630303 !important;
+
       svg {
         fill: #630303;
       }
@@ -172,12 +193,15 @@
   min-width: 320px !important;
   border: 1px solid #eee;
   border-radius: 21px;
+
   .ant-dropdown-menu {
     padding: 24px 20px !important;
     border-radius: 20px !important;
   }
+
   .ant-dropdown-menu-item {
     padding: 0 !important;
+
     &:hover {
       background: #fff !important;
     }
@@ -189,6 +213,17 @@
   display: flex;
   align-items: stretch;
   gap: 75px;
+  @include mixins.response-range(0px, 767px) {
+    padding-left: 16px;
+  }
+}
+
+.test-title-mobile {
+  font-family: 'Book Antiqua', serif;
+  font-weight: 700;
+  font-size: 24px;
+  line-height: 140%;
+  margin: 10px 16px 0;
 }
 
 @font-face {
