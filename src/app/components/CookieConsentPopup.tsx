@@ -31,6 +31,7 @@ const CookieConsentPopup: React.FC = () => {
         if (!cookieConsent) {
             setIsVisible(true)
             setLoading(true);
+            // ANTD sets the overflow-y hidden, I believe, as only during usage of the banner, this issue occurs
             document.body.style.setProperty('overflow-y', 'auto', 'important');
 
             setTimeout(() => {

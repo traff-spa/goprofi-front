@@ -12,10 +12,13 @@ import '@/app/styles/header.scss';
 import { ROUTES } from '@/app/routes/paths';
 import { useAuthStore } from '@/store/authStore';
 import { useTestStore } from "@/store/testStore";
+import useGetViewport from "@app/hooks/useGetViewport.ts";
 
 export const Header = () => {
     const location = useLocation();
     const isMainPage = location.pathname === ROUTES.MAIN;
+
+    const {viewportWidth} = useGetViewport();
 
     const navigate = useNavigate();
     const { user, logout, isAuthenticated } = useAuthStore();
@@ -82,20 +85,21 @@ export const Header = () => {
     ];
 
     return (
+        <>
         <header className="header">
             <div className="header__inner">
                 <div className="logo-wrapper">
                     <div className="logo">
                         {!isMainPage ? (
                             <Link to={ROUTES.MAIN}>
-                                <img src={logo} className="logo" alt="logo" />
+                                <img src={logo} className="logo" alt="logo"/>
                             </Link>
                         ) : (
-                            <img src={logo} className="logo" alt="logo" />
+                            <img src={logo} className="logo" alt="logo"/>
                         )}
                     </div>
 
-                    { testTitle && (isTestPage || isTestResultPage) && (
+                    {testTitle && ((isTestPage && viewportWidth > 767) || (isTestResultPage && viewportWidth > 767)) && (
                         <div className="test-title">{testTitle}</div>
                     )}
                 </div>
@@ -117,5 +121,9 @@ export const Header = () => {
                 )}
             </div>
         </header>
+            {testTitle && viewportWidth <= 767 && (
+                <div className="test-title-mobile">{testTitle}</div>
+            )}
+        </>
     );
 };
