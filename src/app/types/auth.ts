@@ -72,4 +72,7 @@ export type FieldRegistrationType = {
     confirmPassword: string;
     firstName?: string;
     lastName?: string;
+
+    age?: number;
+    gender?: 'male' | 'female'
 }

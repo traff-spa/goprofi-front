@@ -1,6 +1,6 @@
 import {useState, useEffect} from 'react';
 import {useNavigate, useLocation} from 'react-router-dom';
-import {Input, Form, Button, message} from 'antd';
+import {Input, Form, Button, message, Select, Radio} from 'antd';
 import type {FormProps} from 'antd';
 import {Link} from 'react-router-dom';
 
@@ -10,6 +10,8 @@ import {useTestStore} from '@/store/testStore';
 import {ROUTES} from '@/app/routes/paths';
 import {authService} from '@/app/api/services';
 import type {FieldLoginType, FieldRegistrationType} from '@app/types/auth.ts'
+
+const ageOptions = Array.from({ length: 99 - 14 + 1 }, (_, i) => 14 + i);
 
 const Auth = () => {
     const [isLoginMode, setIsLoginMode] = useState(true);
@@ -251,7 +253,40 @@ const Auth = () => {
                                 >
                                     <Input autoComplete="off" placeholder="Введіть ім'я"/>
                                 </Form.Item>
+
                                 <Form.Item<FieldRegistrationType>
+                                    label="Ваш вік"
+                                    name="age"
+                                    rules={[
+                                        {required: true, message: "Вибиріть, будь ласка, вік"},
+                                    ]}
+                                >
+                                     <Select
+                                        placeholder="Вибиріть вік"
+                                        style={{ width: 200 }}
+                                        allowClear
+                                        showSearch
+                                    >
+                                        {ageOptions.map((age) => (
+                                            <Select.Option key={age} value={age}>
+                                                {age}
+                                            </Select.Option>
+                                        ))}
+                                        </Select>
+                                </Form.Item>
+
+                                <Form.Item<FieldRegistrationType>
+                                    label="Стать"
+                                    name="gender"
+                                    rules={[{ required: true, message: "Виберіть, будь ласка, стать" }]}
+                                    >
+                                    <Radio.Group className="gender-radio-group">
+                                        <Radio className="gender-radio" value="male">Чоловік</Radio>
+                                        <Radio className="gender-radio" value="female">Жінка</Radio>
+                                    </Radio.Group>
+                                    </Form.Item>
+
+                                {/* <Form.Item<FieldRegistrationType>
                                     label="Прізвище"
                                     name="lastName"
                                     rules={[
@@ -261,7 +296,8 @@ const Auth = () => {
                                     ]}
                                 >
                                     <Input autoComplete="off" placeholder="Введіть прізвище"/>
-                                </Form.Item>
+                                </Form.Item> */}
+
                                 <Form.Item<FieldRegistrationType>
                                     label="Пароль"
                                     name="password"
