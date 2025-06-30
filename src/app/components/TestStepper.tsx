@@ -1,4 +1,7 @@
 import { useState, FC, useEffect, useCallback } from 'react';
+import { Spin } from 'antd'
+import { LoadingOutlined } from '@ant-design/icons';
+
 import ArrowIcon from '@/assets/icons/arrow-right.svg?react';
 import { useNavigate } from 'react-router-dom';
 
@@ -37,10 +40,8 @@ const TestStepper: FC<Props> = ({ testResultId, setCompleted, initialAnswers = {
   const [loading, setLoading] = useState(false);
   const [currentTestQuestions, setCurrentTestQuestions] = useState<Question[]>([]);
 
-  // Calculate progress percentage
   const progressPercentage = calculateProgressPercentage(currentStep, totalQuestions);
 
-// Set the test page flag and title on the mount
   useEffect(() => {
     setIsTestPage(true);
     setTestTitle('Тест "Хто я"');
@@ -52,7 +53,6 @@ const TestStepper: FC<Props> = ({ testResultId, setCompleted, initialAnswers = {
     };
   }, []);
 
-  // Fetch all questions on mount to get total count
   useEffect(() => {
     const fetchTestData = async () => {
       try {
@@ -94,20 +94,47 @@ const TestStepper: FC<Props> = ({ testResultId, setCompleted, initialAnswers = {
     fetchTestData();
   }, [testResultId, currentStep, getTestPosition]);
 
-  // Handle option selection
-  const handleOptionSelect = useCallback((questionId: number, optionId: number) => {
-    setLocalAnswers(prev => ({
-      ...prev,
-      [questionId]: optionId
-    }));
-  }, []);
-
-  // Save the current step to Zustand whenever it changes
   useEffect(() => {
     if (testResultId && currentStep >= 0) {
       saveTestPosition(testResultId, currentStep);
     }
   }, [currentStep, testResultId, saveTestPosition]);
+
+  const handleOptionSelect = useCallback(async (questionId: number, optionId: number) => {
+    if (loading) return;
+    
+    try {
+      setLoading(true);
+      
+      setLocalAnswers(prev => ({
+        ...prev,
+        [questionId]: optionId
+      }));
+
+      await saveAnswer(testResultId, questionId, optionId);
+      console.log('Answer saved:', { testResultId, questionId, optionId });
+
+      if (currentStep === totalQuestions - 1) {
+        await completeTest(testResultId);
+        setCompleted(true);
+        navigate(`/results/${testResultId}`);
+        return;
+      }
+
+      const nextStep = currentStep + 1;
+      setCurrentStep(nextStep);
+      saveTestPosition(testResultId, nextStep);
+
+      if (currentTestQuestions[nextStep]) {
+        setCurrentQuestion(currentTestQuestions[nextStep]);
+      }
+
+    } catch (error) {
+      console.error('Error saving answer:', error);
+    } finally {
+      setLoading(false);
+    }
+  }, [loading, testResultId, currentStep, totalQuestions, currentTestQuestions, navigate, saveTestPosition, setCompleted]);
 
   // Handle next button click
   const handleNext = useCallback(async () => {
@@ -169,82 +196,85 @@ const TestStepper: FC<Props> = ({ testResultId, setCompleted, initialAnswers = {
   const cursorStyle = { cursor: loading ? 'wait' : 'pointer' };
 
   if (!currentQuestion) {
-    return <div className="test-section">Loading...</div>;
+    return (
+      <div className="test-section" style={{ justifyContent: 'center' }}>
+        <Spin indicator={<LoadingOutlined style={{ fontSize: 48 }} spin />} />
+      </div>
+    )
   }
 
-  // The rest of the component remains the same
   return (
-      <div className="test-section">
-        {/* Component UI, no changes needed here */}
-        <div className="test-section__body">
-          <div className="test-section__title">
-            Питання {currentStep + 1} з {totalQuestions + 1}
-          </div>
-          <div className="test-section__progress">
-            <div
-                className="test-section__progress-bar"
-                style={{ width: `${progressPercentage}%` }}
-            />
-          </div>
-
-          {/* Question and options */}
-          <div className="questions">
-            <div className="questions__title">{currentQuestion.text}</div>
-            <div className="questions__list">
-              {currentQuestion.options.map((option) => (
-                  <div
-                      key={option.id}
-                      className="questions__item"
-                      onClick={() => {
-                        if (!loading) {
-                          handleOptionSelect(currentQuestion.id, option.id);
-                        }
-                      }}
-                      style={cursorStyle}
-                  >
-                    <div className="radio-wrapper">
-                      <input
-                          type="radio"
-                          id={`option-${option.id}`}
-                          name={`question-${currentQuestion.id}`}
-                          value={option.id.toString()}
-                          checked={localAnswers[currentQuestion.id] === option.id}
-                          onChange={()=>{}}
-                      />
-                      <span
-                          className={localAnswers[currentQuestion.id] === option.id ? 'selected' : ''}
-                          style={cursorStyle}
-                      >
-                      {option.text}
-                    </span>
-                    </div>
-                  </div>
-              ))}
-            </div>
-          </div>
+    <div className="test-section">
+      <div className="test-section__body">
+        <div className="test-section__title">
+          Питання {currentStep + 1} з {totalQuestions + 1}
+        </div>
+        <div className="test-section__progress">
+          <div
+              className="test-section__progress-bar"
+              style={{ width: `${progressPercentage}%` }}
+          />
         </div>
 
-        <div className="test-section__footer">
+        <div className="questions">
+          <div className="questions__title">{currentQuestion.text}</div>
+          <div className="questions__list">
+            {currentQuestion.options.map((option) => (
+              <div
+                key={option.id}
+                className="questions__item"
+                onClick={() => {
+                  if (!loading) {
+                    handleOptionSelect(currentQuestion.id, option.id);
+                  }
+                }}
+                style={cursorStyle}
+              >
+                <div className="radio-wrapper">
+                  <input
+                      type="radio"
+                      id={`option-${option.id}`}
+                      name={`question-${currentQuestion.id}`}
+                      value={option.id.toString()}
+                      checked={localAnswers[currentQuestion.id] === option.id}
+                      onChange={()=>{}}
+                  />
+                  <span
+                      className={localAnswers[currentQuestion.id] === option.id ? 'selected' : ''}
+                      style={cursorStyle}
+                  >
+                  {option.text}
+                </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <div className="test-section__footer">
+        <button
+            type="button"
+            onClick={handleBack}
+            disabled={isFirstStep || loading}
+            className="test-section__back-btn"
+        >
+          Назад
+        </button>
+        {isOptionSelected && !loading && (
           <button
-              type="button"
-              onClick={handleBack}
-              disabled={isFirstStep || loading}
-              className="test-section__back-btn"
-          >
-            Назад
-          </button>
-          <button
-              type="button"
-              onClick={handleNext}
-              disabled={!isOptionSelected || loading}
-              className="test-section__next-btn"
+            type="button"
+            onClick={handleNext}
+            disabled={loading}
+            className="test-section__next-btn"
           >
             {isLastStep ? 'Завершити' : 'Далі'}
             <ArrowIcon width={17} height={12} />
           </button>
-        </div>
+        )}
       </div>
-  );
-};
+    </div>
+  )
+}
 
 export default TestStepper;
