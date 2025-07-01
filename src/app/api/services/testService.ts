@@ -87,18 +87,18 @@ export const testService = {
     },
 
     // Tie-breaking functionality
-    getTieBreakers: (testResultId: number) => {
-        return request<TieBreakersResponse>({
+    getTieBreakerQuestions: (testResultId: number) => {
+        return request<TestQuestionsResponse>({
             url: `/test-results/${testResultId}/tie-breaker`,
             method: 'GET',
         });
     },
 
-    saveTieBreakerAnswers: (testResultId: number, answers: Answer[]) => {
+    saveTieBreakerAnswers: (testResultId: number, payload: { scenario_type: string, answers: Answer[]; } ) => {
         return request<TestResult>({
             url: `/test-results/${testResultId}/tie-breaker`,
             method: 'POST',
-            data: { answers },
+            data: payload,
         });
     }
 };

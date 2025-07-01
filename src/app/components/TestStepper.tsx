@@ -14,6 +14,8 @@ import {
   fetchTestResult,
   saveAnswer,
   completeTest,
+  fetchTieBreakerQuestions,
+  submitAllTieBreakerAnswers
 } from '@app/helpers/testHelpers';
 
 import { useTestStore } from '@/store/testStore';
@@ -31,7 +33,6 @@ const TestStepper: FC<Props> = ({ testResultId, setCompleted, initialAnswers = {
 
   // State management
   const [currentQuestion, setCurrentQuestion] = useState<Question | null>(null);
-  // Initialize from Zustand store instead of localStorage
   const [currentStep, setCurrentStep] = useState<number>(() => {
     return testResultId ? getTestPosition(testResultId) : 0;
   });
@@ -39,6 +40,8 @@ const TestStepper: FC<Props> = ({ testResultId, setCompleted, initialAnswers = {
   const [localAnswers, setLocalAnswers] = useState<{[key: number]: number}>(initialAnswers);
   const [loading, setLoading] = useState(false);
   const [currentTestQuestions, setCurrentTestQuestions] = useState<Question[]>([]);
+  const [isTieBreaker, setIsTieBreaker] = useState<boolean>(false);
+  const [scenarioType, setScenarioType] = useState<string | null>(null);
 
   const progressPercentage = calculateProgressPercentage(currentStep, totalQuestions);
 
@@ -54,45 +57,62 @@ const TestStepper: FC<Props> = ({ testResultId, setCompleted, initialAnswers = {
   }, []);
 
   useEffect(() => {
-    const fetchTestData = async () => {
+    if (!testResultId || currentTestQuestions.length > 0) return
+
+    const fetchInitialData = async () => {
+      setLoading(true);
+
       try {
-        setLoading(true);
-        if (testResultId) {
-          // Get test result to find the test ID
-          const testResult = await fetchTestResult(testResultId);
+        const testResult = await fetchTestResult(testResultId);
 
-          if (testResult && testResult.test_id) {
-            // Fetch all questions to get the total count
-            const questions = await fetchTestQuestions(testResult.test_id);
-            setCurrentTestQuestions(questions);
-            setTotalQuestions(questions.length);
+        if (testResult?.result_data?.requires_tie_breaker) {
+          setIsTieBreaker(true);
+          
+          const testId = testResult?.id;
+          const tieBreakerData = await fetchTieBreakerQuestions(testId);
+          const tieBreakerQuestions = tieBreakerData?.questions
 
-            // Get saved position from Zustand
-            const savedStep = getTestPosition(testResultId);
-
-            // Ensure saved step is within valid range
-            const validStep = Math.min(savedStep, questions.length - 1);
-
-            // Set current step and question based on saved position
-            if (validStep !== currentStep) {
-              setCurrentStep(validStep);
-            }
-
-            // Set the correct question based on the current step
-            if (questions.length > 0) {
-              setCurrentQuestion(questions[validStep]);
-            }
+          if (tieBreakerQuestions && tieBreakerQuestions?.length > 0) {
+            const formattedQuestions = tieBreakerQuestions?.map((q: Question) => ({ ...q, id: q?.pair_id }));
+            
+            setScenarioType(tieBreakerData?.scenario_type);
+            setCurrentTestQuestions(formattedQuestions);
+            setTotalQuestions(formattedQuestions?.length);
+            setCurrentStep(0);
+            setCurrentQuestion(formattedQuestions[0]);
           }
+          
+        } else if (testResult && testResult?.id) {
+          if (currentTestQuestions?.length > 0) {
+            setLoading(false);
+            return;
+          }
+
+          const questions = await fetchTestQuestions(testResult?.test_id);
+          
+          setCurrentTestQuestions(questions);
+          setTotalQuestions(questions.length);
+
+          const savedStep = getTestPosition(testResultId);
+          const validStep = Math.min(savedStep, questions?.length - 1);
+          setCurrentStep(validStep);
         }
+
       } catch (error) {
-        console.error('Error fetching test data:', error);
+        console.error('Error fetching initial test data:', error);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchTestData();
-  }, [testResultId, currentStep, getTestPosition]);
+    fetchInitialData();
+  }, [testResultId, currentTestQuestions.length, getTestPosition, fetchTestResult, fetchTestQuestions]);
+
+  useEffect(() => {
+    if (currentTestQuestions?.length > 0 && currentStep < currentTestQuestions?.length) {
+      setCurrentQuestion(currentTestQuestions[currentStep]);
+    }
+  }, [currentStep, currentTestQuestions]);
 
   useEffect(() => {
     if (testResultId && currentStep >= 0) {
@@ -100,80 +120,100 @@ const TestStepper: FC<Props> = ({ testResultId, setCompleted, initialAnswers = {
     }
   }, [currentStep, testResultId, saveTestPosition]);
 
-  const handleOptionSelect = useCallback(async (questionId: number, optionId: number) => {
-    if (loading) return;
-    
+  const submitTieBreakers = async () => {
+    if (!scenarioType) {
+      console.error("Scenario type is missing! Cannot submit tie-breaker answers.");
+      return;
+    }
+
+    setLoading(true);
     try {
-      setLoading(true);
-      
-      setLocalAnswers(prev => ({
-        ...prev,
-        [questionId]: optionId
-      }));
+      const answersPayload = Object?.entries(localAnswers)?.map(([questionId, selectedOptionId]) => {
+        const question = currentTestQuestions.find((q) => q?.id === Number(questionId));
+        const selectedOption = question?.options?.find((opt) => opt?.id === selectedOptionId);
 
-      await saveAnswer(testResultId, questionId, optionId);
-      console.log('Answer saved:', { testResultId, questionId, optionId });
+        return {
+          question_id: Number(questionId),
+          selected_option_id: selectedOptionId,
+          personality_type_id: selectedOption?.personality_type_id,
+          is_tie_breaker: true,
+        }
+      })
 
-      if (currentStep === totalQuestions - 1) {
-        await completeTest(testResultId);
-        setCompleted(true);
-        navigate(`/results/${testResultId}`);
-        return;
-      }
+      await submitAllTieBreakerAnswers(testResultId, answersPayload, scenarioType);
 
-      const nextStep = currentStep + 1;
-      setCurrentStep(nextStep);
-      saveTestPosition(testResultId, nextStep);
-
-      if (currentTestQuestions[nextStep]) {
-        setCurrentQuestion(currentTestQuestions[nextStep]);
-      }
+      setCompleted(true);
+      navigate(`/results/${testResultId}`);
 
     } catch (error) {
-      console.error('Error saving answer:', error);
+      console.error("Failed to submit tie-breaker answers:", error);
     } finally {
       setLoading(false);
     }
-  }, [loading, testResultId, currentStep, totalQuestions, currentTestQuestions, navigate, saveTestPosition, setCompleted]);
+  }
 
   // Handle next button click
-  const handleNext = useCallback(async () => {
-    if (!currentQuestion) return;
+  const handleNext = useCallback(async (newlySelectedOptionId?: number) => {
+    if (loading || !currentQuestion) return;
 
+    setLoading(true);
     try {
-      setLoading(true);
+      const questionId = currentQuestion.id;
+      const optionId = newlySelectedOptionId ?? localAnswers[questionId];
 
-      // Save the current answer
-      await saveAnswer(testResultId, currentQuestion.id, localAnswers[currentQuestion.id]);
-
-      if (currentStep === totalQuestions - 1) {
-        // Complete the test
-        await completeTest(testResultId);
-
-        setCompleted(true);
-
-        // Navigate to the result page with the test result ID
-        navigate(`/results/${testResultId}`);
+      if (optionId === undefined) {
+        console.error("No option selected for the current question.");
+        setLoading(false);
         return;
       }
 
-      // Move to the next question
-      const nextStep = currentStep + 1;
-      setCurrentStep(nextStep);
+      const isLastStep = currentStep === totalQuestions - 1;
 
-      // Save progress to Zustand
-      saveTestPosition(testResultId, nextStep);
+      if (isTieBreaker) {
+        if (isLastStep) {
+          await submitTieBreakers();
+        } else {
+          setCurrentStep(prev => prev + 1);
+        }
+      } else {
+        await saveAnswer(testResultId, questionId, optionId);
 
-      // Get the next question from our already loaded questions
-      if (currentTestQuestions[nextStep]) {
-        setCurrentQuestion(currentTestQuestions[nextStep]);
+        if (isLastStep) {
+          const completeTestData = await completeTest(testResultId);
+          if (completeTestData?.requires_tie_breaker) {
+            const tieBreakerData = await fetchTieBreakerQuestions(completeTestData?.id);
+            if (tieBreakerData && tieBreakerData.questions.length > 0) {
+              const { questions, scenario_type } = tieBreakerData;
+              const formattedQuestions = questions.map((q: Question) => ({ ...q, id: q?.pair_id }));
+              
+              setScenarioType(scenario_type);
+              setIsTieBreaker(true);
+              setCurrentTestQuestions(formattedQuestions);
+              setTotalQuestions(formattedQuestions.length);
+              setCurrentStep(0);
+              setLocalAnswers({});
+            } else {
+              setCompleted(true);
+              navigate(`/results/${testResultId}`);
+            }
+          } else {
+            setCompleted(true);
+            navigate(`/results/${testResultId}`);
+          }
+        } else {
+          setCurrentStep(prev => prev + 1);
+        }
       }
     } catch (error) {
-      console.error('Error saving answer or fetching next question:', error);
+      console.error("Error in handleNext:", error);
     } finally {
       setLoading(false);
     }
-  }, [currentQuestion, currentStep, localAnswers, testResultId, totalQuestions, currentTestQuestions, navigate, saveTestPosition]);
+  }, [
+    loading, currentQuestion, localAnswers, currentStep, totalQuestions, isTieBreaker, 
+    testResultId, setCompleted, navigate, saveAnswer, completeTest, 
+    fetchTieBreakerQuestions, submitTieBreakers
+  ])
 
   // Handle back button click
   const handleBack = useCallback(() => {
@@ -187,6 +227,14 @@ const TestStepper: FC<Props> = ({ testResultId, setCompleted, initialAnswers = {
       setCurrentQuestion(currentTestQuestions[prevStep]);
     }
   }, [currentStep, currentTestQuestions, testResultId, saveTestPosition]);
+
+  // Handle select and next button
+  const handleOptionSelect = useCallback((questionId: number, optionId: number) => {
+    if (loading) return;
+
+    setLocalAnswers((prev) => ({ ...prev, [questionId]: optionId }));
+    handleNext(optionId);
+  }, [loading, setLocalAnswers, handleNext]);
 
   // UI states
   const isFirstStep = currentStep === 0;
@@ -206,9 +254,16 @@ const TestStepper: FC<Props> = ({ testResultId, setCompleted, initialAnswers = {
   return (
     <div className="test-section">
       <div className="test-section__body">
+        {isTieBreaker && (
+          <div className="test-section__subtitle">
+            Вау! А ти цікава особистість, хочемо краще дослідити твій тип
+          </div>
+        )}
+
         <div className="test-section__title">
-          Питання {currentStep + 1} з {totalQuestions}
+          {isTieBreaker ? 'Додаткові питання' : 'Питання'} {currentStep + 1} з {totalQuestions}
         </div>
+
         <div className="test-section__progress">
           <div
               className="test-section__progress-bar"
@@ -219,7 +274,7 @@ const TestStepper: FC<Props> = ({ testResultId, setCompleted, initialAnswers = {
         <div className="questions">
           <div className="questions__title">{currentQuestion.text}</div>
           <div className="questions__list">
-            {currentQuestion.options.map((option) => (
+            {currentQuestion?.options?.map((option) => (
               <div
                 key={option.id}
                 className="questions__item"

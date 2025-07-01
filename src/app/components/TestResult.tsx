@@ -1,4 +1,6 @@
 import React, { useEffect } from 'react';
+import { Spin } from 'antd'
+import { LoadingOutlined } from '@ant-design/icons';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTestStore } from '@/store/testStore';
 import { useAuthStore } from '@/store/authStore';
@@ -40,7 +42,11 @@ const TestResult: React.FC = () => {
 
 
     if (isLoading) {
-        return <div className="test-container">Завантаження результатів тесту...</div>;
+        return (
+            <div className="test-container loader">
+                <Spin indicator={<LoadingOutlined style={{ fontSize: 48 }} spin />} />
+            </div>
+        )
     }
 
     if (error || !currentTestResult || !currentTestResult.completed_at) {

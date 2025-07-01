@@ -16,6 +16,9 @@ export interface TestQuestionsResponse {
     test_id: number;
     test_name: string;
     questions: Question[];
+    scenario_type?: string;
+    test_result_id?: number;
+    tied_type_ids?: number[];
 }
 
 export interface SaveAnswersResponse {
@@ -116,6 +119,7 @@ export interface TestResult {
     result_data?: ResultData;
     progress?: number;
     used_tie_breaker?: boolean;
+    requires_tie_breaker?: boolean;
 }
 
 export interface Props {

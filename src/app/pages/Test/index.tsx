@@ -1,4 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
+import { Spin } from 'antd'
+import { LoadingOutlined } from '@ant-design/icons';
 import { useNavigate, useParams } from 'react-router-dom';
 import '@app/styles/test.scss'
 import TestStepper from '@app/components/TestStepper'
@@ -104,23 +106,23 @@ const Test = () => {
   // Loading state
   if (isLoading || isLoadingAnswers) {
     return (
-        <div className="test-container">
-          <div>Завантаження тесту...</div>
-        </div>
-    );
+      <div className="test-container loader">
+        <Spin indicator={<LoadingOutlined style={{ fontSize: 48 }} spin />} />
+      </div>
+    )
   }
 
   // Error state
   if (error || !currentTestResult || currentTestQuestions.length === 0) {
     return (
-        <div className="test-container">
-          <div>
+        <div className="test-container loader">
+          <div style={{ marginTop: '-45px' }}>
             <h2>Помилка завантаження тесту</h2>
             <p>{error || 'Тест не знайдено або виникла помилка.'}</p>
             <button
-                onClick={() => navigate(ROUTES.MAIN)}
-                className="test-results-btn"
-                type="button"
+              onClick={() => navigate(ROUTES.MAIN)}
+              className="test-results-btn"
+              type="button"
             >
               Повернутися на головну
             </button>
@@ -131,17 +133,17 @@ const Test = () => {
 
   // Render test or completion screen
   return (
-      <div className="test-container">
-        {!isCompleted ? (
-            <TestStepper
-                testResultId={currentTestResult.id}
-                setCompleted={setCompleted}
-                initialAnswers={initialAnswers}
-            />
-        ) : (
-            <TestResult />
-        )}
-      </div>
+    <div className="test-container">
+      {!isCompleted ? (
+        <TestStepper
+            testResultId={currentTestResult.id}
+            setCompleted={setCompleted}
+            initialAnswers={initialAnswers}
+        />
+      ) : (
+        <TestResult />
+      )}
+    </div>
   );
 };
 

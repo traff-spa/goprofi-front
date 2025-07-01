@@ -71,12 +71,54 @@ export const saveAnswer = async (
  * @param testResultId - ID of the test result
  * @returns Success status
  */
-export const completeTest = async (testResultId: number): Promise<boolean> => {
+export const completeTest = async (testResultId: number): Promise<any> => {
     try {
-        await testService.completeTest(testResultId);
-        return true;
+        const response = await testService.completeTest(testResultId);
+        return response;
     } catch (error) {
         console.error('Error completing test:', error);
         return false;
+    }
+};
+
+
+/**
+ * Fetch tie-breaker questions for a test
+ * @param testResultId - ID of the test
+ * @returns Array of tie-breaker questions
+ */
+export const fetchTieBreakerQuestions = async (testResultId: number): Promise<any> => {
+    try {
+        const response = await testService.getTieBreakerQuestions(testResultId);
+        console.log('fetchTieBreakerQuestions - response', response)
+        return response;
+    } catch (error) {
+        console.error('Error fetching tie-breaker questions:', error);
+        return [];
+    }
+};
+
+/**
+ * Submits all collected tie-breaker answers in a single batch.
+ * @param testResultId - ID of the test result
+ * @param answers - Array of prepared answer objects
+ * @param scenarioType - The scenario type string
+ * @returns The final test result
+ */
+export const submitAllTieBreakerAnswers = async (
+    testResultId: number,
+    answers: Answer[],
+    scenarioType: string
+) => {
+    try {
+        const payload = {
+            scenario_type: scenarioType,
+            answers: answers
+        };
+        const result = await testService.saveTieBreakerAnswers(testResultId, payload);
+        return result;
+    } catch (error) {
+        console.error('Error submitting tie-breaker answers:', error);
+        throw error;
     }
 };

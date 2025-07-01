@@ -14,6 +14,7 @@ export interface QuestionOption {
     text: string;
     value: number;
     option_order: number | null;
+    personality_type_id?: number | null;
 }
 
 export interface Question {
@@ -25,6 +26,7 @@ export interface Question {
     question_order: number | null;
     is_active: boolean;
     options: QuestionOption[];
+    pair_id?: number
 }
 
 export interface Answer {
