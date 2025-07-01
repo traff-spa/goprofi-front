@@ -8,13 +8,6 @@ export interface Test {
     updated_at: string;
 }
 
-// export interface Category {
-//     id: number;
-//     test_id: number;
-//     name: string;
-//     description: string | null;
-// }
-
 export interface QuestionOption {
     id: number;
     question_id: number;
@@ -34,7 +27,6 @@ export interface Question {
     options: QuestionOption[];
 }
 
-// Updated Answer type to match backend
 export interface Answer {
     question_id: number;
     selected_option_id: number;
