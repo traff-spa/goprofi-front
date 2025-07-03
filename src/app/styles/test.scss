@@ -23,6 +23,7 @@
     background: var(--podlozhka);
     border-radius: 40px;
     padding: 44px 60px;
+    position: relative;
 
     h1 {
       font-size: 32px;
@@ -104,6 +105,21 @@
     font-size: 16px;
     line-height: 160%;
     color: var(--black);
+    max-height: 420px; 
+    overflow: hidden;
+    margin-bottom: 50px;
+
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 350px; 
+      border-radius: 0 0 40px 40px;
+      pointer-events: none;
+      background: linear-gradient(to bottom, transparent, white);
+    }
 
     p {
       font-family: var(--font-family);
@@ -144,6 +160,31 @@
       border: none;
       height: 1px;
       background: var(--line-check-box);
+    }
+  }
+
+  &__unlock-button {
+    left: 50%;
+    bottom: 30px;
+    transform: translateX(-50%);
+    position: absolute;
+    z-index: 99;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 44px;
+    max-width: 240px;
+    width: 100%;
+    font-weight: 600;
+    font-size: 16px;
+    color: #fff;
+    background: #006654;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: .3s ease-in-out;
+
+    &:hover {
+      background: #338576;
     }
   }
 }
@@ -559,3 +600,37 @@ html, body {
   margin-top: 30px;
 }
 
+.purchase-modal {
+
+  .ant-modal-content {
+    padding: 44px 40px;
+  }
+
+  &__title {
+    font-size: 22px;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 20px;
+  }
+
+  &__button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 44px;
+    max-width: 240px;
+    width: 100%;
+    font-weight: 600;
+    font-size: 16px;
+    color: #fff;
+    background: #006654;
+    border-radius: 50px;
+    cursor: pointer;
+    margin: 0 auto;
+    transition: .3s ease-in-out;
+
+    &:hover {
+      background: #338576;
+    }
+  }
+}

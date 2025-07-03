@@ -8,14 +8,17 @@ $background-light: #F5F5F5;
 $desktop-accept-background: #EFEBE8;
 $shadow-main: 0px 4px 30px rgba(217, 216, 214, 0.5);
 
-.ant-modal-content {
-  padding: 20px !important;
-  width: 480px !important;
-  height: 190px !important;
-  background: $background-white;
-  border: 1px solid $border-color;
-  border-radius: 20px !important;
+.cookie-consent-modal {
+  .ant-modal-content {
+    padding: 20px !important;
+    width: 480px !important;
+    height: 190px !important;
+    background: $background-white;
+    border: 1px solid $border-color;
+    border-radius: 20px !important;
+  }
 }
+
 
 .cookie-consent-content {
   display: flex;
