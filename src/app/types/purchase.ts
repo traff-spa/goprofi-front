@@ -7,8 +7,9 @@ export interface PurchaseRequest {
   productCount: number[];
   clientFirstName: string;
   clientEmail: string;
-  clientPhone: string;
   userId: string;
+  testResultId: string
+  returnUrl: string
 }
 
 interface PaymentData {

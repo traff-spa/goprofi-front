@@ -7,11 +7,11 @@ import {useAuthStore} from "@/store/authStore.ts";
 
 
 const App = () => {
-    const {checkAuth} = useAuthStore();
+  const {checkAuth} = useAuthStore();
 
-    useEffect(() => {
-        checkAuth().catch(e=>console.error(e));
-    }, []);
+  useEffect(() => {
+    checkAuth().catch(e=>console.error(e));
+  }, []);
 
   return (
     <BrowserRouter>

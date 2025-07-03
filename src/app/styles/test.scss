@@ -109,16 +109,18 @@
     overflow: hidden;
     margin-bottom: 50px;
 
-    &::after {
-      content: '';
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      height: 350px; 
-      border-radius: 0 0 40px 40px;
-      pointer-events: none;
-      background: linear-gradient(to bottom, transparent, white);
+    &.hidden {
+      &::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 350px; 
+        border-radius: 0 0 40px 40px;
+        pointer-events: none;
+        background: linear-gradient(to bottom, transparent, white);
+      }
     }
 
     p {
@@ -169,6 +171,7 @@
     transform: translateX(-50%);
     position: absolute;
     z-index: 99;
+    gap: 8px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -180,8 +183,23 @@
     color: #fff;
     background: #006654;
     border-radius: 50px;
+    padding: 0 24px;
     cursor: pointer;
     transition: .3s ease-in-out;
+    
+    &:focus,
+    &:active {
+      outline: none !important;
+    }
+
+    svg {
+      fill: #fff;
+      transition: .3s ease-in-out;
+    }
+
+    span {
+      margin-left: auto;
+    }
 
     &:hover {
       background: #338576;
@@ -207,6 +225,14 @@
       font-size: 24px;
       line-height: 140%;
       margin-bottom: 20px;
+    }
+  }
+
+  &__list {
+    &.hidden {
+      filter: blur(4px);
+      pointer-events: none;
+      user-select: none;
     }
   }
 
@@ -601,16 +627,20 @@ html, body {
 }
 
 .purchase-modal {
-
   .ant-modal-content {
-    padding: 44px 40px;
+    padding: 22px 30px;
+    border-radius: 20px;
+    @include mixins.response(767px) {
+      padding: 22px;
+    }
   }
 
   &__title {
-    font-size: 22px;
-    font-weight: 700;
+    font-size: 18px;
+    font-weight: 500;
+    line-height: normal;
     text-align: center;
-    margin-bottom: 20px;
+    margin-bottom: 12px;
   }
 
   &__button {
@@ -628,9 +658,37 @@ html, body {
     cursor: pointer;
     margin: 0 auto;
     transition: .3s ease-in-out;
+    outline: none;
+    max-width: 240px;
+    width: 100%;
+    padding: 0 24px;
+    border: none;
+
+    span {
+      gap: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+    }
+    
+    &:focus,
+    &:active {
+      outline: none !important;
+    }
+
+    svg {
+      fill: #fff;
+      transition: .3s ease-in-out;
+    }
+
+    small {
+      margin-left: auto;
+    }
 
     &:hover {
-      background: #338576;
+      color: #fff !important;
+      background: #338576 !important;
     }
   }
 }
