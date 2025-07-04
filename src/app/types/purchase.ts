@@ -8,9 +8,8 @@ export interface PurchaseRequest {
   clientFirstName: string;
   clientEmail: string;
   userId: string;
-  testResultId: string
-  returnUrl: string,
-  serviceUrl: string
+  testResultId: string;
+  returnUrl: string;
 }
 
 interface PaymentData {
@@ -25,6 +24,7 @@ interface PaymentData {
   productName: string[];
   productPrice: number[];
   productCount: number[];
+  returnUrl: string
 }
 
 interface OrderData {
@@ -38,9 +38,9 @@ interface OrderData {
   currency: string;
   signature: string;
   userId: number;
-  productName: string[][];
-  productPrice: number[][];
-  productCount: number[][];
+  productName: string[];
+  productPrice: number[];
+  productCount: number[];
   paymentResponse: PaymentData;
 }
 

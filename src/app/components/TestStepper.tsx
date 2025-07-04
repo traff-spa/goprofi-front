@@ -6,7 +6,7 @@ import ArrowIcon from '@/assets/icons/arrow-right.svg?react';
 import { useNavigate } from 'react-router-dom';
 
 import '@app/styles/test.scss';
-import { Props, Question } from '@/app/types';
+import { Answer, Props, Question } from '@/app/types';
 
 import {
   calculateProgressPercentage,
@@ -120,7 +120,9 @@ const TestStepper: FC<Props> = ({ testResultId, setCompleted, initialAnswers = {
     }
   }, [currentStep, testResultId, saveTestPosition]);
 
-  const submitTieBreakers = async () => {
+  const submitTieBreakers = async (finalAnswers: any) => {
+    console.log('finalAnswers to submit', finalAnswers);
+  
     if (!scenarioType) {
       console.error("Scenario type is missing! Cannot submit tie-breaker answers.");
       return;
@@ -128,17 +130,17 @@ const TestStepper: FC<Props> = ({ testResultId, setCompleted, initialAnswers = {
 
     setLoading(true);
     try {
-      const answersPayload = Object?.entries(localAnswers)?.map(([questionId, selectedOptionId]) => {
-        const question = currentTestQuestions.find((q) => q?.id === Number(questionId));
+      const answersPayload = Object?.entries(finalAnswers)?.map(([questionId, selectedOptionId]) => {
+        const question = currentTestQuestions?.find((q) => q?.id === Number(questionId));
         const selectedOption = question?.options?.find((opt) => opt?.id === selectedOptionId);
 
         return {
           question_id: Number(questionId),
-          selected_option_id: selectedOptionId,
-          personality_type_id: selectedOption?.personality_type_id,
+          selected_option_id: Number(selectedOptionId),
+          personality_type_id: selectedOption?.personality_type_id ?? undefined,
           is_tie_breaker: true,
-        }
-      })
+        };
+      });
 
       await submitAllTieBreakerAnswers(testResultId, answersPayload, scenarioType);
 
@@ -171,7 +173,8 @@ const TestStepper: FC<Props> = ({ testResultId, setCompleted, initialAnswers = {
 
       if (isTieBreaker) {
         if (isLastStep) {
-          await submitTieBreakers();
+          const finalAnswers = { ...localAnswers, [questionId]: optionId };
+          await submitTieBreakers(finalAnswers);
         } else {
           setCurrentStep(prev => prev + 1);
         }
@@ -250,6 +253,8 @@ const TestStepper: FC<Props> = ({ testResultId, setCompleted, initialAnswers = {
       </div>
     )
   }
+
+   console.log('localAnswers', localAnswers)
 
   return (
     <div className="test-section">

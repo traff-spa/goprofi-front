@@ -22,7 +22,6 @@ interface WayforpayPaymentData {
   productPrice: number[];
   productCount: number[];
   returnUrl: string;
-  serviceUrl: string;
 }
 
 const redirectToWayforpay = (paymentUrl: string, paymentData: WayforpayPaymentData) => {
@@ -83,21 +82,17 @@ const PurchaseModal: React.FC<Props> = ({ purchaseModalVisible, setPurchaseModal
       productName: ['Розблокування повного звіту по тесту'],
       productPrice: [1],
       productCount: [1],
-      clientFirstName: `${user.firstName} ${user.firstName}` || "Клієнт",
+      clientFirstName: `${user.firstName} ${user.lastName}` || "Клієнт",
       clientEmail: user.email,
       userId: user?.id,
       testResultId: testResultId,
       returnUrl: `${window.location.origin}/results/${testResultId}`
-      // serviceUrl: `${window.location.origin}/service-callback`
-      // returnUrl: `${window.location.origin}/?payment_status=success&test_id=${testResultId}`,
     }
 
     try {
       const response = await purchaseService.createPurchase(purchaseData);
 
       if (response && response.result.success && response.result.paymentUrl) {
-        console.log('response', response)
-
         redirectToWayforpay(response.result.paymentUrl, response.result.paymentData);
       } else {
         setLoading(false);

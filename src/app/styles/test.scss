@@ -105,11 +105,11 @@
     font-size: 16px;
     line-height: 160%;
     color: var(--black);
-    max-height: 420px; 
-    overflow: hidden;
     margin-bottom: 50px;
 
     &.hidden {
+      max-height: 420px; 
+      overflow: hidden;
       &::after {
         content: '';
         position: absolute;

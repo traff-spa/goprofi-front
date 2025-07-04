@@ -32,6 +32,7 @@ export interface Question {
 export interface Answer {
     question_id: number;
     selected_option_id: number;
+    personality_type_id?: number;
     response_value?: number;
     is_tie_breaker?: boolean;
 }
