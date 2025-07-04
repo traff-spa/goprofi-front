@@ -9,7 +9,8 @@ export interface PurchaseRequest {
   clientEmail: string;
   userId: string;
   testResultId: string
-  returnUrl: string
+  returnUrl: string,
+  serviceUrl: string
 }
 
 interface PaymentData {

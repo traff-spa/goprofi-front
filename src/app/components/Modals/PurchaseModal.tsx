@@ -21,6 +21,8 @@ interface WayforpayPaymentData {
   productName: string[];
   productPrice: number[];
   productCount: number[];
+  returnUrl: string;
+  serviceUrl: string;
 }
 
 const redirectToWayforpay = (paymentUrl: string, paymentData: WayforpayPaymentData) => {
@@ -85,7 +87,8 @@ const PurchaseModal: React.FC<Props> = ({ purchaseModalVisible, setPurchaseModal
       clientEmail: user.email,
       userId: user?.id,
       testResultId: testResultId,
-      returnUrl: `${window.location.origin}/results/${testResultId}`,
+      returnUrl: `${window.location.origin}/results/${testResultId}`
+      // serviceUrl: `${window.location.origin}/service-callback`
       // returnUrl: `${window.location.origin}/?payment_status=success&test_id=${testResultId}`,
     }
 
