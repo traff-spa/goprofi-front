@@ -109,6 +109,7 @@ export interface ResultData {
 
 export interface TestResult {
     id: number;
+    is_paid: boolean;
     user_id: number;
     test_id: number;
     test_name?: string;

@@ -90,7 +90,6 @@ export const completeTest = async (testResultId: number): Promise<any> => {
 export const fetchTieBreakerQuestions = async (testResultId: number): Promise<any> => {
     try {
         const response = await testService.getTieBreakerQuestions(testResultId);
-        console.log('fetchTieBreakerQuestions - response', response)
         return response;
     } catch (error) {
         console.error('Error fetching tie-breaker questions:', error);

@@ -4,11 +4,28 @@ import svgr from 'vite-plugin-svgr'
 import { fileURLToPath } from 'url'
 import { nodePolyfills } from 'vite-plugin-node-polyfills'
 
+const spaFallback = () => ({
+  name: 'spa-fallback',
+  configureServer(server: any) {
+    server.middlewares.use((req: any, res: any, next: any) => {
+      if (
+        !req.url.includes('.') && 
+        !req.url.startsWith('/api') &&
+        !req.url.startsWith('/@')
+      ) {
+        req.url = '/index.html';
+      }
+      next();
+    });
+  }
+});
+
 export default defineConfig({
   plugins: [
     react(),
     svgr(),
-    nodePolyfills()
+    nodePolyfills(),
+    spaFallback()
   ],
   server: {
     allowedHosts: ['goprofi.ai', 'goprofi.app'],

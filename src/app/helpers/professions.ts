@@ -231,12 +231,32 @@ export const professionsByType: Record<number, ProfessionCategory[]> = {
         }
     ],
 
-    // Default professions for other types
-    0: [
+    // Hidden content type
+    999: [
         {
-            title: "Творчі професії",
-            description: "Для людей що відчувають потребу створювати щось унікальне та цінують свободу самовираження",
-            professions: ["Художник", "Письменник", "Дизайнер", "Режисер", "Фотограф", "Музикант", "Архітектор"]
+            title: "Lorem, ipsum dolor.",
+            description: "Lorem ipsum dolor, sit amet consectetur adipisicing elit. Aliquam, nisi. Soluta, ullam?",
+            professions: ["Lorem", "Lorem, ipsum", "Lorem, ipsum dolor", "Lorem", "Lorem", "Lorem ipsum", "Lorem"]
+        },
+        {
+            title: "Lorem ipsum dolor, sit amet consectetur",
+            description: "Lorem ipsum dolor, sit amet consectetur adipisicing elit. Aliquam, nisi. Soluta, ullam?",
+            professions: ["Lorem", "Lorem", "Lorem ipsum", "Lorem"]
+        },
+        {
+            title: "Lorem, ipsum.",
+            description: "Lorem ipsum dolor, sit amet consectetur adipisicing elit. Aliquam, nisi. Soluta, ullam?",
+            professions: ["Lorem", "Lorem, ipsum", "Lorem ipsum", "Lorem"]
+        },
+        {
+            title: "Lorem ipsum dolor, sit amet",
+            description: "Lorem ipsum dolor, sit amet consectetur adipisicing elit. Aliquam, nisi. Soluta, ullam?",
+            professions: ["Lorem", "Lorem, ipsum", "Lorem, ipsum dolor", "Lorem", "Lorem", "Lorem ipsum", "Lorem"]
+        },
+        {
+            title: "Lorem, ipsum dolor.",
+            description: "Lorem ipsum dolor, sit amet consectetur adipisicing elit. Aliquam, nisi. Soluta, ullam?",
+            professions: ["Lorem", "Lorem, ipsum", "Lorem, ipsum dolor", "Lorem", "Lorem ipsum", "Lorem", "Lorem ipsum", "Lorem", "Lorem ipsum", "Lorem"]
         }
     ]
 };
