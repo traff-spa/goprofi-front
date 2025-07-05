@@ -3,7 +3,7 @@ import { Outlet, useLocation } from 'react-router-dom';
 import { Header } from './Header';
 import { Footer } from './Footer';
 import { ROUTES } from '@/app/routes/paths';
-import CookieConsentPopup from "@components/CookieConsentPopup.tsx";
+import CookieConsentPopup from "@/app/components/Modals/CookieConsentPopup";
 
 export const MainLayout: FC = () => {
     const location = useLocation();

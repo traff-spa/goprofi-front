@@ -2,7 +2,7 @@ import React, {useState, useEffect} from 'react';
 import {Button, Modal, Typography} from 'antd';
 import Cookies from 'js-cookie';
 
-import '../styles/CookieConsentPopup.scss';
+import '../../styles/CookieConsentPopup.scss';
 import useGetViewport from "@app/hooks/useGetViewport.ts";
 
 const {Text, Link} = Typography;
@@ -65,6 +65,7 @@ const CookieConsentPopup: React.FC = () => {
                 mask={false}
                 loading={loading}
                 className="cookie-consent-modal"
+                wrapClassName="cookie-consent-modal-wrapper" 
             >
                 <div className='text'>
                     <div className="cookie-consent-title">

@@ -14,5 +14,6 @@ export interface TypeDetails {
     typeNumber: number;
     typeName: string;
     typeDescription: string;
+    bottomDescription?: string;
     mainTraits: TypeTrait[];
 }

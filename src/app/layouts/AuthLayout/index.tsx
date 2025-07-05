@@ -4,7 +4,7 @@ import { Outlet } from 'react-router-dom';
 import logo from '@/assets/logo.svg';
 import '@/app/styles/auth.scss';
 import { ROUTES } from '@/app/routes/paths';
-import CookieConsentPopup from "@components/CookieConsentPopup.tsx";
+import CookieConsentPopup from "@/app/components/Modals/CookieConsentPopup";
 
 export const AuthLayout: FC = () => {
     return (

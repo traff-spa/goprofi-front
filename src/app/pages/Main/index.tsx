@@ -47,27 +47,45 @@ const Main = () => {
   };
 
   return (
-      <div className="main-section">
-        <div className="main-section__inner">
-          <div className="main-section__left">
-            <div className="main-section__title">Тест "Хто я?"</div>
-            <div className="main-section__text">
-              Дізнайтеся свій психотип та визначте сильні сторони, які допоможуть вам у професійному розвитку.
-            </div>
-            <button
-                onClick={handleStartTest}
-                className="main-section__button"
-                type="button"
-            >
-              Пройти тест
-              <span><ArrowIcon width={17} height={12} /></span>
-            </button>
+    <div className="main-section">
+      <div className="main-section__inner">
+        <div className="main-section__left">
+          <div className="main-section__title">Тест "Хто я?"</div>
+          <div className="main-section__text">
+            Дізнайтеся свій психотип та визначте сильні сторони, які допоможуть вам у професійному розвитку.
           </div>
-          <div className="main-section__right">
-            <img src="/images/main-section-img.png" width="704" height="677" alt="image" />
+          <button
+              onClick={handleStartTest}
+              className="main-button"
+              type="button"
+          >
+            Пройти тест
+            <span><ArrowIcon width={17} height={12} /></span>
+          </button>
+        </div>
+        <div className="main-section__right">
+          <div className="scroll-wrapper">
+            <img 
+              className="scrolling-img" 
+              src="/images/main-section-img-lg.png" 
+              width="704" 
+              height="1252" 
+              alt="image" 
+              loading="lazy"
+            />
+            <img 
+              className="scrolling-img" 
+              src="/images/main-section-img-lg.png" 
+              width="704" 
+              height="1252" 
+              alt="image"
+              loading="lazy"
+            />
           </div>
         </div>
+
       </div>
+    </div>
   );
 };
 

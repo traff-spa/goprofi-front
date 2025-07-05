@@ -1,4 +1,6 @@
 import React, { useEffect } from 'react';
+import { Spin } from 'antd'
+import { LoadingOutlined } from '@ant-design/icons';
 import { Link, useNavigate } from 'react-router-dom';
 import ArrowIcon from '@/assets/icons/arrow-right.svg?react';
 
@@ -89,7 +91,14 @@ export const TestHistory: React.FC = () => {
                     <div className="test-history__head">
                         <div className="test-history__title">Історія тестів</div>
                     </div>
-                    <div>Завантаження...</div>
+                    <div style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        minHeight: '60vh'
+                    }}>
+                         <Spin indicator={<LoadingOutlined style={{ fontSize: 48 }} spin />} />
+                    </div>
                 </div>
             </div>
         );
@@ -104,7 +113,7 @@ export const TestHistory: React.FC = () => {
 
                 <button
                     onClick={handleStartTest}
-                    className="main-section__button"
+                    className="main-button"
                     type="button"
                 >
                     Пройти тест

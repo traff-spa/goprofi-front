@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Button, Modal, message } from 'antd';
+import { Button, message } from 'antd';
 
 import { purchaseService } from '@app/api/services/purchaseService';
 import { useAuthStore } from '@/store/authStore';
@@ -58,12 +58,10 @@ const redirectToWayforpay = (paymentUrl: string, paymentData: WayforpayPaymentDa
 }
 
 interface Props {
-  purchaseModalVisible: boolean;
-  setPurchaseModalVisible: (state: boolean) => void;
   testResultId: string; 
 }
 
-const PurchaseModal: React.FC<Props> = ({ purchaseModalVisible, setPurchaseModalVisible, testResultId }) => {
+const PurchaseModal: React.FC<Props> = ({ testResultId }) => {
   const { user } = useAuthStore();
   const [loading, setLoading] = useState(false);
 
@@ -106,21 +104,17 @@ const PurchaseModal: React.FC<Props> = ({ purchaseModalVisible, setPurchaseModal
   }
 
   return (
-    <Modal
-      footer={null}
-      width={"510px"}
-      closeIcon={false}
-      className="purchase-modal"
-      open={purchaseModalVisible}
-      onCancel={() => setPurchaseModalVisible(false)}
-    >
+    <div className="purchase-modal">
       <div className="purchase-modal__body">
         <div className="purchase-modal__title">
-          Розблокуй весь результат та свою кар'єрну мапу
+          Розблокуй зараз
+        </div>
+        <div className="purchase-modal__text">
+          Весь результат та свою кар'єрну мапу
         </div>
         <Button
           loading={loading}
-           onClick={handlePurchase}
+            onClick={handlePurchase}
           className="purchase-modal__button"
         >
           {loading ? 'Обробка...' : (
@@ -132,8 +126,8 @@ const PurchaseModal: React.FC<Props> = ({ purchaseModalVisible, setPurchaseModal
           )}
         </Button>
       </div>
-    </Modal>
-  );
+    </div>
+  )
 }
 
 export default PurchaseModal;

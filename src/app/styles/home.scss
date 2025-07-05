@@ -35,6 +35,12 @@
     border-radius: 40px;
     background: rgba(255, 255, 255, 0.6);
     padding: 20px 66px;
+    .main-button {
+      margin-top: 36px;
+      @include mixins.response(991px) {
+        margin-top: 20px;
+      }
+    }
     @include mixins.response(1200px) {
       padding: 20px 30px;
     }
@@ -80,103 +86,38 @@
       line-height: 140%;
     }
   }
-  &__button {
-    margin-top: 36px;
-    border-radius: 60px;
-    padding: 0 10px 0 28px;
-    width: 330px;
-    height: 64px;
-    background: #006654;
-    display: flex;
-    align-items: center;
-    font-weight: 500;
-    font-size: 20px;
-    line-height: 140%;
-    text-align: center;
-    color: var(--white);
-    cursor: pointer;
-    transition: .3s ease-in-out;
-    span {
-      width: 48px;
-      height: 48px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: #338576;
-      border-radius: 50%;
-      margin-left: auto;
-      flex-shrink: 0;
-      transition: .3s ease-in-out;
-      svg {
-        fill: #fff;
-      }
-    }
-    &:hover {
-      color: #fff;
-      background: #338576;
-      span {
-        background: #006654;
-      }
-    }
-    @include mixins.response(991px) {
-      width: 240px;
-      height: 48px;
-      font-size: 16px;
-      margin-top: 20px;
-      padding: 0 10px 0 22px;
-      span {
-        width: 36px;
-        height: 36px;
-      }
-    }
-  }
 }
 
 // TODO: ANIMATION
-// @include mixins.response-min(1440px) {
-//   .main-section__right {
-//     position: relative;
-//     width: 706px;
-//     height: 679px;
-//     overflow: hidden;
-//   }
-  
-//   .scroll-container {
-//     position: absolute;
-//     width: 100%;
-//     height: 100%;
-//     overflow: hidden;
-//   }
-  
-//   .scrolling-wrapper {
-//     display: flex;
-//     flex-direction: column;
-//     position: absolute;
-//     width: 100%;
-//     height: 300%;
-//     animation: scrollUp 60s linear infinite;
-//   }
-  
-//   .scrolling-img {
-//     width: 100%;
-//     height: auto;
-//     object-fit: cover;
-//   }
-  
-//   @keyframes scrollUp {
-//     0% {
-//       transform: translateY(0);
-//     }
-//     33.33% {
-//       transform: translateY(-33.33%);
-//     }
-//     66.66% {
-//       transform: translateY(-66.66%);
-//     }
-//     100% {
-//       transform: translateY(0);
-//     }
-//   }
-  
-  
+.main-section__right {
+  height: 680px;
+  @include mixins.response(991px) {
+    height: 375px;
+  }
+}
+
+.scroll-wrapper {
+  display: flex;
+  flex-direction: column;
+  animation: infinite-scroll 45s linear infinite;
+  will-change: transform;
+}
+
+.scrolling-img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+@keyframes infinite-scroll {
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(-50%);
+  }
+}
+
+// .main-section__right:hover .scroll-wrapper {
+//   animation-play-state: paused;
 // }

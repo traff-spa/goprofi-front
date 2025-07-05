@@ -7,6 +7,14 @@
   @include mixins.response(767px) {
     margin: 15px auto 100px;
   }
+  &__inner {
+    .main-button {
+      margin: 36px 0;
+      @include mixins.response(767px) {
+        margin: 20px 0;
+      }
+    }
+  }
   &__head {
     margin-bottom: 32px;
     @include mixins.response(767px) {
@@ -144,9 +152,15 @@
     cursor: pointer;
     transition: .3s ease-in-out;
     text-decoration: none;
-    @include mixins.hover() {
+    svg {
+      transition: .3s ease-in-out;
+    }
+    &:hover {
       border-color: var(--blue);
       color: var(--blue);
+      svg {
+        transform: rotate(-45deg);
+      }
     }
     &.in-progress {
       justify-content: space-between;
@@ -154,7 +168,7 @@
       color: #006654;
       svg {
         fill: #006654;
-        transition: .3s ease-in-outr;
+        transition: .3s ease-in-out;
       }
       @include mixins.hover() {
         background: #006654;

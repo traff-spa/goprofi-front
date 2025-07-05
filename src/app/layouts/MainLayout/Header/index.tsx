@@ -99,8 +99,11 @@ export const Header = () => {
                         )}
                     </div>
 
-                    {testTitle && ((isTestPage && viewportWidth > 767) || (isTestResultPage && viewportWidth > 767)) && (
-                        <div className="test-title">{testTitle}</div>
+                    {testTitle && (isTestPage && viewportWidth > 767) && (
+                        <div className="test-title">Тест {testTitle}</div>
+                    )}
+                    {testTitle && (isTestResultPage && viewportWidth > 767) && (
+                        <div className="test-title">Результат теста {testTitle}</div>
                     )}
                 </div>
                 {isAuthenticated && hasToken ? (
@@ -122,7 +125,14 @@ export const Header = () => {
             </div>
         </header>
             {testTitle && viewportWidth <= 767 && (
-                <div className="test-title-mobile">{testTitle}</div>
+                <>
+                    {isTestPage && (
+                        <div className="test-title-mobile">Тест {testTitle}</div>
+                    )}
+                    {isTestResultPage && (
+                        <div className="test-title-mobile">Результат теста {testTitle}</div>
+                    )}
+                </>
             )}
         </>
     );
