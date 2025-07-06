@@ -121,6 +121,11 @@ export interface TestResult {
     progress?: number;
     used_tie_breaker?: boolean;
     requires_tie_breaker?: boolean;
+    message?: string;
+    questions?: any;
+    scenario_type?: string;
+    test_result_id?: number;
+    tied_type_ids?: number[];
 }
 
 export interface Props {

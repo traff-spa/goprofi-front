@@ -135,9 +135,21 @@ const TestStepper: FC<Props> = ({ testResultId, setCompleted, initialAnswers = {
         });
       }
 
-      await submitAllTieBreakerAnswers(testResultId, answersPayload, scenarioType);
-      setCompleted(true);
-      navigate(`/results/${testResultId}`);
+      const response = await submitAllTieBreakerAnswers(testResultId, answersPayload, scenarioType);
+
+      if (response && response?.questions && response?.questions?.length > 0) {
+        const { questions, scenario_type } = response;
+        const formattedQuestions = questions?.map((q: any) => ({ ...q, id: q.pair_id || q.id }));
+        
+        setScenarioType(scenario_type || 'scenario_3');
+        setCurrentTestQuestions(formattedQuestions);
+        setTotalQuestions(formattedQuestions.length);
+        setCurrentStep(0);
+        setLocalAnswers({});
+      } else {
+        setCompleted(true);
+        navigate(`/results/${testResultId}`);
+      }
     } catch (error) {
       console.error("Failed to submit tie-breaker answers:", error);
     } finally {

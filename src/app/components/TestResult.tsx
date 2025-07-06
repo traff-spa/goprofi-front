@@ -11,7 +11,6 @@ import { getProfessionsForType, getTypeDetails } from '@app/helpers/professions'
 import LampIcon from '@/assets/icons/lamp.svg?react';
 import '@app/styles/test.scss';
 
-import { formatDate } from '../helpers/dateHelpers'
 import PurchaseModal from './Modals/PurchaseModal'
 
 const TestResult: React.FC = () => {
@@ -74,11 +73,10 @@ const TestResult: React.FC = () => {
   }
 
   // Extracting result data
-  const { primary_type, result_data, test_name, completed_at } = currentTestResult;
+  const { primary_type, result_data, test_name } = currentTestResult;
   const isPaid = currentTestResult?.is_paid
   const primaryType = result_data?.primary_type || primary_type;
   const wingType = result_data?.wing_type;
-  const formattedDate = formatDate(completed_at);
 
   // Get professions based on primary type ID
   const professionCategories = getProfessionsForType(isPaid ? primaryType?.id : 999);
@@ -93,7 +91,7 @@ const TestResult: React.FC = () => {
         <div className="test-result">
           <div className="test-result__inner">
             <div className="test-result__title">
-              Вітаємо з успішним проходженням тесту {test_name} о {formattedDate} 🎉
+              Вітаємо з успішним проходженням тесту {test_name} 🎉
             </div>
 
             <div className="test-result__description">
