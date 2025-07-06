@@ -248,10 +248,10 @@ export const useTestStore = create<TestStore>()(
                 set({ isLoading: true, error: null });
 
                 try {
-                    const response = await testService.getTieBreakers(testResultId);
+                    const response = await testService.getTieBreakerQuestions(testResultId);
 
                     // Transform the tied_type_ids into the expected format
-                    const tiedTypeObjects = response.tied_type_ids.map(id => ({
+                     const tiedTypeObjects = (response.tied_type_ids || [])?.map((id: number) => ({
                         type_id: id,
                         name: "",
                         score: 0
@@ -274,7 +274,7 @@ export const useTestStore = create<TestStore>()(
                 }
             },
 
-            saveTieBreakerAnswers: async (testResultId: number, answers: Answer[]): Promise<TestResult | null> => {
+            saveTieBreakerAnswers: async (testResultId: number, payload: { scenario_type: string, answers: Answer[] }): Promise<TestResult | null> => {
                 set({ isLoading: true, error: null });
 
                 try {
@@ -287,12 +287,15 @@ export const useTestStore = create<TestStore>()(
                     }
 
                     // Mark these answers as tie breakers
-                    const tieBreakerAnswers = answers.map(answer => ({
+                    const tieBreakerAnswers = payload?.answers?.map(answer => ({
                         ...answer,
                         is_tie_breaker: true
                     }));
 
-                    const result = await testService.saveTieBreakerAnswers(testResultId, tieBreakerAnswers);
+                    const result = await testService.saveTieBreakerAnswers(testResultId, {
+                        ...payload,
+                        answers: tieBreakerAnswers
+                    });
 
                     set({
                         currentTestResult: result,

@@ -7,7 +7,7 @@ import { nodePolyfills } from 'vite-plugin-node-polyfills'
 const spaFallback = () => ({
   name: 'spa-fallback',
   configureServer(server: any) {
-    server.middlewares.use((req: any, res: any, next: any) => {
+    server.middlewares.use((req: any, _res: any, next: any) => {
       if (
         !req.url.includes('.') && 
         !req.url.startsWith('/api') &&

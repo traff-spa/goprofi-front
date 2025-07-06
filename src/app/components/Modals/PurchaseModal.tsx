@@ -40,14 +40,15 @@ const redirectToWayforpay = (paymentUrl: string, paymentData: WayforpayPaymentDa
 
   for (const key in paymentData) {
     if (Object.prototype.hasOwnProperty.call(paymentData, key)) {
-      const value = paymentData[key];
+      const typedKey = key as keyof WayforpayPaymentData;
+      const value = paymentData[typedKey]
       
       if (Array.isArray(value)) {
         value.forEach(item => {
-          createHiddenInput(`${key}[]`, item);
+          createHiddenInput(`${key}[]`, item.toString());
         });
       } else {
-        createHiddenInput(key, value);
+        createHiddenInput(key, value.toString());
       }
     }
   }

@@ -7,7 +7,6 @@ import type {
     TestsResponse,
     TestQuestionsResponse,
     SaveAnswersResponse,
-    TieBreakersResponse,
     Question
 } from '@/app/types';
 

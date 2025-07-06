@@ -76,7 +76,7 @@ export interface TestStore {
     completeTest: (testResultId: number) => Promise<TestResult | null>;
     // New tiebreaking functions
     fetchTieBreakers: (testResultId: number) => Promise<Question[]>;
-    saveTieBreakerAnswers: (testResultId: number, answers: Answer[]) => Promise<TestResult | null>;
+    saveTieBreakerAnswers: (testResultId: number, payload: { scenario_type: string; answers: Answer[]; }) => Promise<TestResult | null>;
     lastSavedAnswerTimestamp: number;
     // Test position tracking
     testPositions: { [testResultId: number]: number };
