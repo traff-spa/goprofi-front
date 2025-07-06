@@ -217,7 +217,7 @@ const TestStepper: FC<Props> = ({ testResultId, setCompleted, initialAnswers = {
   ]);
 
   const handleBack = useCallback(() => {
-    if (currentStep > 0 && !isTieBreaker) {
+    if (currentStep > 0) {
       setCurrentStep(prev => prev - 1);
     }
   }, [currentStep, isTieBreaker]);
@@ -334,7 +334,7 @@ const TestStepper: FC<Props> = ({ testResultId, setCompleted, initialAnswers = {
         <button
             type="button"
             onClick={handleBack}
-            disabled={isFirstStep || loading || isTieBreaker}
+            disabled={isFirstStep || loading}
             className="test-section__back-btn"
         >
           Назад
@@ -352,7 +352,7 @@ const TestStepper: FC<Props> = ({ testResultId, setCompleted, initialAnswers = {
             disabled={loading}
             className="test-section__next-btn"
           >
-            {isLastStep ? 'Завершити' : 'Далі'}
+            {(isLastStep && scenarioType !== 'scenario_3') ? 'Завершити' : 'Далі'}
             <ArrowIcon width={17} height={12} />
           </button>
         )}
