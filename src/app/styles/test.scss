@@ -1,7 +1,7 @@
 @use './mixins.scss';
 
 .result {
-  margin: 40px auto 140px;
+  margin: 40px auto 90px;
   @include mixins.response(767px) {
     margin: 15px auto 82px;
   }
@@ -10,7 +10,7 @@
 .test-result {
   max-width: 960px;
   width: 100%;
-  margin: 0 auto 140px;
+  margin: 0 auto 90px;
   @include mixins.response(991px) {
     margin-bottom: 80px;
   }
@@ -55,6 +55,16 @@
       font-size: 24px;
       line-height: 120%;
       color: var(--black);
+    }
+  }
+
+  &__name {
+    font-weight: 700;
+    font-size: 32px;
+    line-height: normal;
+    margin-bottom: 15px;
+    @include mixins.response(767px) {
+      font-size: 24px;
     }
   }
 
@@ -167,38 +177,28 @@
 
     .quote-bubble {
       position: relative;
-      background-color: #D1FB95;
-      padding: 10px 20px 15px 50px;
-      border-radius: 15px;
-      font-weight: 700;
-      font-size: 28px;
+      background-color: #006654;
+      padding: 6px 16px 6px 44px;
+      border-radius: 6px;
+      font-weight: 500;
+      font-size: 16px;
       line-height: 140%;
       margin: 40px 0 0;
-      color: var(--black);
+      color: #fff;
       &::before {
         content: '';
         background-image: url('../../assets/icons/quote.svg');
         background-repeat: no-repeat;
         background-position: center;
+        background-size: cover;
         position: absolute;
-        width: 34px;
-        height: 34px;
-        top: 13px;
-        left: 10px;
+        width: 16px;
+        height: 16px;
+        top: 8px;
+        left: 16px;
         font-size: 50px; 
-        color: #000;
+        color: #fff;
         line-height: 1;
-      }
-      &::after {
-        content: '';
-        position: absolute;
-        left: 20px;
-        bottom: -10px;
-        width: 20px;
-        height: 20px;
-        background-color: #D1FB95;
-        transform: rotate(45deg);
-        border-radius: 3px;
       }
     }
   }
@@ -838,71 +838,6 @@ html, body {
   &__left {
     max-width: 525px;
     width: 100%;
-    ol {
-      list-style: none;
-      padding-left: 0;
-      counter-reset: custom-counter;
-      li {
-        position: relative;
-        padding-left: 45px;
-        margin-bottom: 20px;
-        font-weight: 500;
-        font-size: 16px;
-        line-height: 160%;
-        color: var(--black);
-        counter-increment: custom-counter;
-        &::before {
-          content: counter(custom-counter);
-          position: absolute;
-          left: 0;
-          top: 50%;
-          transform: translateY(-50%);
-          width: 28px;
-          height: 28px;
-          border-radius: 50%;
-          background-color: #fff;
-          color: #000;
-          font-weight: 500;
-          font-size: 14px;
-          line-height: normal;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-        }
-        &::after {
-          content: '';
-          position: absolute;
-          left: -5px;
-          top: 50%;
-          transform: translateY(-50%);
-          width: 36px;
-          height: 36px;
-          border: 1px solid #fff;
-          border-radius: 50%;
-          background: transparent;
-        }
-
-        &:nth-child(1)::before {
-          color: #12813e;
-        }
-
-        &:nth-child(2)::before {
-          color: #fc7900;
-        }
-
-        &:nth-child(3)::before {
-          color: #1814f3;
-        }
-
-        &:nth-child(4)::before {
-          color: #ee55f1;
-        }
-
-        &:last-of-type {
-          margin-bottom: 0;
-        }
-      }
-    }
   }
   &__right {
     max-width: 275px;
@@ -963,12 +898,13 @@ html, body {
       content: counter(custom-counter);
       position: absolute;
       left: 0;
-      top: 0;
+      top: 50%;
+      transform: translateY(-50%);
       width: 28px;
       height: 28px;
       border-radius: 50%;
-      background-color: var(--black);;
-      color: #fff;
+      background-color: #fff;
+      color: #12813e;
       font-weight: 500;
       font-size: 14px;
       line-height: normal;
@@ -980,10 +916,11 @@ html, body {
       content: '';
       position: absolute;
       left: -5px;
-      top: -5px;
+      top: 50%;
+      transform: translateY(-50%);
       width: 36px;
       height: 36px;
-      border: 1px solid #000;
+      border: 1px solid #fff;
       border-radius: 50%;
       background: transparent;
     }
@@ -1003,8 +940,15 @@ html, body {
   gap: 14px;
   display: flex;
   align-items: flex-start;
+  svg {
+    flex-shrink: 0;
+  }
   @include mixins.response(767px) {
-    font-size: 24px;
+    font-size: 20px;
     line-height: 120%;
+    svg {
+      width: 25px;
+      height: 25px;
+    }
   }
 }

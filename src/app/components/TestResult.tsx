@@ -6,7 +6,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useTestStore } from '@/store/testStore';
 import { useAuthStore } from '@/store/authStore';
 import { ROUTES } from '@/app/routes/paths';
-import { getProfessionsForType, getTypeDetails } from '@app/helpers/professions';
+import { getProfessionsForType, getTypeDetails, getRoadMapDetails } from '@app/helpers/professions';
 
 import LampIcon from '@/assets/icons/lamp.svg?react';
 import '@app/styles/test.scss';
@@ -85,6 +85,9 @@ const TestResult: React.FC = () => {
   const typeDetails = getTypeDetails(primaryType?.id, wingType?.id);
   const contentData = isPaid ? typeDetails?.mainTraits : typeDetails?.mainTraits?.slice(0, 3)
 
+  // Get type Road-map based on primary type and wing type
+  const roadMapData = getRoadMapDetails(primaryType?.id, wingType?.id)
+
   return (
     <>
       <div className="result">
@@ -94,13 +97,13 @@ const TestResult: React.FC = () => {
               Вітаємо з успішним проходженням тесту {test_name} 🎉
             </div>
 
+            <div className="test-result__name">{typeDetails?.typeName}</div>
+
             <div className="test-result__description">
-              {primaryType?.id !== 1 && <><span>Ви {typeDetails.typeNumber} тип еннеаграми</span>,</>} {typeDetails.typeDescription}
+              {typeDetails.typeDescription}
             </div>
 
             <div className={!isPaid ? 'test-result__content hidden' : 'test-result__content'}>
-              {primaryType?.id !== 1 && <h3>Основні риси {typeDetails.typeNumber}-го типу:</h3>}
-
               {contentData?.map((trait, index) => (
                 <React.Fragment key={index}>
                   <h3>{index + 1}. {trait?.title}</h3>
@@ -111,7 +114,9 @@ const TestResult: React.FC = () => {
                 </React.Fragment>
               ))}
               
-              {(primaryType?.id === 1 && isPaid) && <div className="quote-bubble">{typeDetails.bottomDescription}</div>}
+              {(isPaid && typeDetails.bottomDescription) && (
+                <div className="quote-bubble">{typeDetails.bottomDescription}</div>
+              )}
 
               {!isPaid && (
                 <PurchaseModal testResultId={id} />
@@ -120,94 +125,108 @@ const TestResult: React.FC = () => {
           </div>
         </div>
         
-        {/* TODO: logic */}
-        {primaryType?.id === 1 && (
-          <div className="test-result">
-            <div className="test-result__inner">
-              <div className="test-result__title">
-                Твоя кар'єрна Road-map
-              </div>
-              <div className={!isPaid ? 'test-result__content hidden' : 'test-result__content'}>
-                <h3>Тебе мотивує в роботі:</h3>
-                <div className="motivation-block">
-                  <div className="motivation-block__left">
-                    <ol>
-                      <li>прагнення до досконалості;</li>
-                      <li>високі стандарти;</li>
-                      <li>відповідальність перед собою та іншими;</li>
-                      <li>бажання бути «правильним» фахівцем, якому можна довіряти.</li>
-                    </ol>
+        <div className="test-result">
+          <div className="test-result__inner">
+            <div className="test-result__title">Твій карєрний план</div>
+
+            <div className={!isPaid ? 'test-result__content hidden' : 'test-result__content'}>
+              {roadMapData.motivation && (
+                <>
+                  <h3>{roadMapData.motivation.title}</h3>
+                  <div className="motivation-block">
+                    <div className="motivation-block__left">
+                      <ol className="counter-list">
+                        {roadMapData?.motivation?.points?.map((point: string, index: number) => (
+                          <li key={index}>{point}</li>
+                        ))}
+                      </ol>
+                    </div>
+                    <div className="motivation-block__right"></div>
                   </div>
-                  <div className="motivation-block__right">
+                </>
+              )}
 
+              {roadMapData.subconsciousMotive && (
+                <>
+                  <h3>{roadMapData.subconsciousMotive.title}</h3>
+                  <div className="test-result__description">{roadMapData.subconsciousMotive.text}</div>
+                </>
+              )}
+
+              {roadMapData.importantInWork && (
+                <>
+                  <h3>{roadMapData.importantInWork.title}</h3>
+                  <ul className="ckeckbox-list">
+                    {roadMapData?.importantInWork?.points?.map((point: string, index: number) => (
+                      <li key={index}>{point}</li>
+                    ))}
+                  </ul>
+                  <hr />
+                </>
+              )}
+
+              {roadMapData.mainFear && (
+                <>
+                  <h3>{roadMapData.mainFear.title}</h3>
+                  {roadMapData.mainFear.text.split('\n').map((paragraph: string, index: number) => (
+                    <p key={index}>{paragraph}</p>
+                  ))}
+                  {roadMapData.mainFear.note && (
+                    <p>
+                      <span style={{ color: '#a41010', fontWeight: '700' }}>
+                        {roadMapData.mainFear.note}
+                      </span>
+                    </p>
+                  )}
+                  <hr />
+                </>
+              )}
+
+              {roadMapData.strengthsAndWeaknesses && (
+                <>
+                  <div className="content-subtitle">{roadMapData.strengthsAndWeaknesses.title}</div>
+                  <div className="list-columns">
+                    <div className="list-columns__item">
+                      <div className="list-columns__item-subtitle">{roadMapData.strengthsAndWeaknesses.strengths.title}</div>
+                      <ul>
+                        {roadMapData?.strengthsAndWeaknesses?.strengths?.points?.map((point: string, index: number) => (
+                          <li key={index}>{point}</li>
+                        ))}
+                      </ul>
+                    </div>
+                    <div className="list-columns__item">
+                      <div className="list-columns__item-subtitle">{roadMapData.strengthsAndWeaknesses.weaknesses.title}</div>
+                      <ul>
+                        {roadMapData?.strengthsAndWeaknesses?.weaknesses?.points?.map((point: string, index: number) => (
+                          <li key={index}>{point}</li>
+                        ))}
+                      </ul>
+                    </div>
                   </div>
-                </div>
+                  <hr />
+                </>
+              )}
 
-                <h3>Підсвідомий мотив:</h3>
-                <div className="test-result__description">Бути бездоганним, щоб заслужити повагу і уникнути критики — перш за все внутрішньої.</div>
-
-                <h3>Тобі важливо в роботі, (спирайся на ці при виборі команди):</h3>
-                <ul className="ckeckbox-list">
-                  <li>робити «правильну» справу;</li>
-                  <li>працювати за цінностями;</li>
-                  <li>змінювати щось на краще;</li>
-                  <li>відчувати, що ваша робота має сенс, користь і моральну вагу.</li>
-                </ul>
-                 <hr />
-
-                <h3>Твій основний страх:</h3>
-                <p>Зробити помилку або не відповідати своїм внутрішнім стандартам. Основна мотивація — бути хорошими, правильними та виправляти недоліки як у собі, так і в оточуючому світі.</p>
-                <p>
-                  <span style={{ color: '#a41010', fontWeight: '700' }}>
-                  Страхи - це нормально, головне розуміти чи не керують вони тобою, для цього треба їх дуже добре знати.
-                  </span>
-                </p>
-                <hr />
-
-                <div className="content-subtitle">Твої сильні професійні сторони  твої слабкі професійні сторони</div>
-                <div className="list-columns">
-                  <div className="list-columns__item">
-                    <div className="list-columns__item-subtitle">Сильні сторони:</div>
-                    <ul>
-                      <li>висока дисципліна і організованість;</li>
-                      <li>вміння бачити деталі, які інші можуть пропустити;</li>
-                      <li>відповідальність і відданість справі;</li>
-                      <li>моральна стійкість і принциповість;</li>
-                      <li>сильне прагнення до вдосконалення.</li>
-                    </ul>
+              {roadMapData.recommendations && (
+                <>
+                  <div className="content-subtitle">
+                    <LampIcon width={40} height={40} />
+                    {roadMapData.recommendations.title}
                   </div>
-                  <div className="list-columns__item">
-                    <div className="list-columns__item-subtitle">Професійні слабкості:</div>
-                    <ul>
-                      <li>перфекціонізм може призводити до відкладання виконання завдань (прокрастинації);</li>
-                      <li>схильність до критичності — як до себе, так і до інших;</li>
-                      <li>високий рівень внутрішнього стресу через потребу в ідеальності.</li>
-                    </ul>
-                  </div>
-                </div>
-                 <hr />
+                  <ol className="counter-list">
+                    {roadMapData.recommendations.points.map((point: string, index: number) => (
+                      <li key={index} dangerouslySetInnerHTML={{ __html: point }} />
+                    ))}
+                  </ol>
+                </>
+              )}
 
-                <div className="content-subtitle">
-                  <LampIcon width={40} height={40} />
-                  Рекомендації для побудови успішного кар'єрного розвитку:
-                </div>
-                <ol className="counter-list">
-                  <li>Навчіться <b>визначати пріоритети:</b> не кожна задача потребує однакової уваги та ідеального виконання. </li>
-                  <li>Практикуйте <b>правило 80/20:</b> визначайте найважливіші завдання, які дадуть максимальний результат.</li>
-                  <li><b>Відпустіть контроль:</b> не бійтеся делегувати. Навчання довіряти іншим дозволить вам зосередитися на більш значущих завданнях і уникнути емоційного вигорання.</li>
-                  <li><b>Розвивайте емоційну гнучкість:</b> робота з емоціями допоможе знизити рівень критичності до себе та інших. Практикуйте вдячність і фокусуйтесь на досягненнях, а не на недоліках.</li>
-                  <li><b>Прийміть ідею "достатньо добре":</b> ваша робота не завжди повинна бути ідеальною. Часто "достатньо добре" — це саме те, що потрібно для прогресу та результатів.</li>
-                  <li><b>Розширюйте уявлення про успіх:</b> успіх — це не тільки результат, але й шлях до нього. Додайте більше гнучкості та задоволення в процес своєї роботи.</li>
-                </ol>
-
-                {!isPaid && (
-                  <PurchaseModal testResultId={id} />
-                )}
-              </div>
+              {!isPaid && (
+                <PurchaseModal testResultId={id} />
+              )}
             </div>
           </div>
-        )}
-        
+        </div>
 
         <div className="suitable-professions">
           <div className="suitable-professions__title">
