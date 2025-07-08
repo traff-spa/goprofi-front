@@ -86,7 +86,14 @@ const TestResult: React.FC = () => {
   const contentData = isPaid ? typeDetails?.mainTraits : typeDetails?.mainTraits?.slice(0, 3)
 
   // Get type Road-map based on primary type and wing type
-  const roadMapData = getRoadMapDetails(primaryType?.id, wingType?.id)
+  const roadMap = getRoadMapDetails(primaryType?.id, wingType?.id)
+  const roadMapData = isPaid 
+    ? roadMap
+    : {
+      motivation: roadMap.motivation,
+      subconsciousMotive: roadMap.subconsciousMotive,
+      importantInWork: roadMap.importantInWork
+    }
 
   return (
     <>
