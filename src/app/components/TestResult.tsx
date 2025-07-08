@@ -173,7 +173,12 @@ const TestResult: React.FC = () => {
                   ))}
                   {roadMapData.mainFear.note && (
                     <p>
-                      <span style={{ color: '#a41010', fontWeight: '700' }}>
+                      <span style={{
+                        fontFamily: 'sans-serif',
+                        fontStyle: 'italic',
+                        color: '#000',
+                        fontWeight: '700'
+                      }}>
                         {roadMapData.mainFear.note}
                       </span>
                     </p>
