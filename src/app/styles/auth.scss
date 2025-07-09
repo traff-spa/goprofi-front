@@ -9,7 +9,6 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(255, 255, 255, 0.3);
   @include mixins.response(991px) {
     height: 48px;
   }
@@ -54,7 +53,7 @@
     width: 100%;
     flex-basis: 424px;
     min-height: 640px;
-    background-size: cover;
+    background-size: contain;
     background-position: top left;
     img {
       height: 100%;

@@ -353,7 +353,7 @@
   &__item-profession {
     border-radius: 100px;
     padding: 10px 20px;
-    height: 42px;
+    min-height: 42px;
     background: var(--white);
     font-weight: 500;
     font-size: 16px;
