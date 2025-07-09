@@ -1,15 +1,15 @@
-import {useState, useEffect} from 'react';
-import {useNavigate, useLocation} from 'react-router-dom';
-import {Input, Form, Button, message} from 'antd';
-import type {FormProps} from 'antd';
-import {Link} from 'react-router-dom';
-
+import { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { Input, Form, Button, message } from 'antd';
+import type { FormProps} from 'antd';
+import { Link } from 'react-router-dom';
 import useGetViewport from '@app/hooks/useGetViewport';
-import {useAuthStore} from '@/store/authStore';
-import {useTestStore} from '@/store/testStore';
-import {ROUTES} from '@/app/routes/paths';
-import {authService} from '@/app/api/services';
-import type {FieldLoginType, FieldRegistrationType} from '@app/types/auth.ts'
+import { useAuthStore } from '@/store/authStore';
+import { useTestStore } from '@/store/testStore';
+import { ROUTES } from '@/app/routes/paths';
+import { authService } from '@/app/api/services';
+import { getDisplayError } from '@/app/utils/errorMapping'
+import type { FieldLoginType, FieldRegistrationType } from '@app/types/auth.ts'
 
 const Auth = () => {
     const [isLoginMode, setIsLoginMode] = useState(true);
@@ -73,7 +73,6 @@ const Auth = () => {
             authService.handleGoogleCallback(token)
                 .then(response => {
                     setUser(response.user);
-                    message.success('Google login successful!');
                     handlePostAuthRedirection(response.user);
                 })
                 .catch(() => {
@@ -89,16 +88,15 @@ const Auth = () => {
         setIsLoading(true);
         try {
             await login(String(values.email).toLowerCase(), values.password);
-            message.success('Login successful!');
             navigate(ROUTES.TEST_HISTORY);
         } catch (error: any) {
             console.error('Login error:', error);
 
             setFormErrors({
-                password: error.message || 'Login failed. Please check your credentials.'
+                password: getDisplayError(error.message || 'Login failed. Please check your credentials.')
             });
 
-            message.error(error.message || 'Login failed. Please check your credentials.');
+            message.error(getDisplayError(error.message || 'Login failed. Please check your credentials.'));
         } finally {
             setIsLoading(false);
         }
@@ -113,7 +111,6 @@ const Auth = () => {
                 values.firstName as string,
                 values.lastName as string
             );
-            message.success('Registration successful!');
 
             if (registeredUser?.id) {
                 const userId = parseInt(registeredUser.id.toString(), 10);
@@ -137,7 +134,7 @@ const Auth = () => {
                 return;
             }
         } catch (error: any) {
-            message.error(error?.message || error?.[0]?.msg || 'Registration failed. Please try again.');
+            message.error(getDisplayError(error?.errors?.message || error?.errors?.[0]?.msg || 'Registration failed. Please try again.'));
         } finally {
             setIsLoading(false);
         }
@@ -158,7 +155,10 @@ const Auth = () => {
         <div className="auth">
             <div className="auth__inner">
                 {viewportWidth > 767 && (
-                    <div className="auth__left" style={{backgroundImage: 'url(/images/auth-section-img-2x.png)'}}/>
+                    <div
+                        className="auth__left"
+                        style={{ backgroundImage: isLoginMode ? 'url(/images/auth-section-img-2x.png)' : 'url(/images/reg-section-img-2x.png)' }}
+                    />
                 )}
                 <div className="auth__right">
                     <div className="auth__close">

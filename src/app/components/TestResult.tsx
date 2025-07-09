@@ -134,7 +134,7 @@ const TestResult: React.FC = () => {
         
         <div className="test-result">
           <div className="test-result__inner">
-            <div className="test-result__title">Твій карєрний план</div>
+            <div className="test-result__title">Твій кар’єрний план</div>
 
             <div className={!isPaid ? 'test-result__content hidden' : 'test-result__content'}>
               {roadMapData.motivation && (
@@ -172,7 +172,7 @@ const TestResult: React.FC = () => {
                 </>
               )}
 
-              {roadMapData.mainFear && (
+              {'mainFear' in roadMapData && roadMapData.mainFear && (
                 <>
                   <h3>{roadMapData.mainFear.title}</h3>
                   {roadMapData.mainFear.text.split('\n').map((paragraph: string, index: number) => (
@@ -194,7 +194,7 @@ const TestResult: React.FC = () => {
                 </>
               )}
 
-              {roadMapData.strengthsAndWeaknesses && (
+              {'strengthsAndWeaknesses' in roadMapData && roadMapData.strengthsAndWeaknesses && (
                 <>
                   <div className="content-subtitle">{roadMapData.strengthsAndWeaknesses.title}</div>
                   <div className="list-columns">
@@ -219,7 +219,7 @@ const TestResult: React.FC = () => {
                 </>
               )}
 
-              {roadMapData.recommendations && (
+              {'recommendations' in roadMapData && roadMapData.recommendations && (
                 <>
                   <div className="content-subtitle">
                     <LampIcon width={40} height={40} />
